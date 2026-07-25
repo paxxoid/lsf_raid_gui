@@ -1,0 +1,12 @@
+[project]
+name = "lsf-raid-gui"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyside6>=6.11.1",
+    "pywin32>=312",
+    "requests>=2.34.2",
+    "ruamel-yaml>=0.19.1",
+]

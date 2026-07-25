@@ -1,0 +1,34 @@
+
+
+app_info:
+  general:
+    name: lsf_raid_helper_gui
+    version: 0.0.1
+    desc: Handles excel file creation and email for daily disbution of year over year KPIs vs same week LY
+    debug_mode: True
+    lsf_apikey: lasf_LGLjVSi6LbgbDOs4MbtFY8QS7YKCwrRFY6kjooPW_Z0
+
+
+    required_directories:
+      - reports
+      - tmp
+      - logs
+      - templates
+  
+    zeal_window_show: raw #other option on parsed
+  
+
+logging:
+  console_output: True
+  log_file: log_file_{date}.log
+  path: logs
+  rotation: 5 #this number will be converted to MB
+  rotation_max_days: 20 #will clearn files older than this number of days in the log directory
+
+
+
+zeal_pipes:
+  reconnect_delay: 2
+  zeal_types_to_relay_base: [0, 1]
+  zeal_types_to_relay_sub: [28, 29, 281, 287, 286]
+

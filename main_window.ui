@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1573</width>
+    <height>774</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>1031</width>
+      <height>721</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Zeal Output</string>
+    </property>
+    <widget class="QTabWidget" name="zeal_loot_output">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>1011</width>
+       <height>671</height>
+      </rect>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::TabShape::Rounded</enum>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="zeal_messages_tab">
+      <attribute name="title">
+       <string>Zeal Messages</string>
+      </attribute>
+      <widget class="QTextBrowser" name="text_zeal_output">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>10</y>
+         <width>1001</width>
+         <height>591</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_text_zeal_output_clear">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>610</y>
+         <width>131</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Clear Window</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="zeal_messages_rolls_tab">
+      <attribute name="title">
+       <string>Rolls</string>
+      </attribute>
+      <widget class="QPushButton" name="button_zeal_rolls_output_clear">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>610</y>
+         <width>131</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Clear Window</string>
+       </property>
+      </widget>
+      <widget class="QTextBrowser" name="text_zeal_rolls">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>10</y>
+         <width>1001</width>
+         <height>591</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="zeal_messages_loot_tab">
+      <attribute name="title">
+       <string>Loot</string>
+      </attribute>
+      <widget class="QTextBrowser" name="text_zeal_loot">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>10</y>
+         <width>1001</width>
+         <height>591</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_zeal_loot_output_clear">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>610</y>
+         <width>131</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Clear Window</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>1050</x>
+      <y>0</y>
+      <width>511</width>
+      <height>581</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Raid Infromation</string>
+    </property>
+    <widget class="QListWidget" name="text_raid_members">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>211</width>
+       <height>501</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>540</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Current Zone:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>520</y>
+       <width>131</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Members in Raid:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_4">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>530</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Update Database</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>70</y>
+       <width>49</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>60</y>
+       <width>251</width>
+       <height>321</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Details</string>
+     </property>
+     <widget class="QWidget" name="formLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>231</width>
+        <height>227</height>
+       </rect>
+      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="horizontalSpacing">
+        <number>20</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Raid Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Raid ID</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Zone:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Start Time:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>End Time:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_raid_name">
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Select Raid</string>
+         </property>
+         <property name="indent">
+          <number>-1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Raid Date:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_raid_id">
+         <property name="text">
+          <string>Select Raid</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="label_raid_zone">
+         <property name="text">
+          <string>Select Raid</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="label_raid_date">
+         <property name="text">
+          <string>Select Raid</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="label_raid_start">
+         <property name="text">
+          <string>Select Raid</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="label_raid_end">
+         <property name="text">
+          <string>Select Raid</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QComboBox" name="raids_scheduled_combo">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>20</y>
+       <width>421</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::ContextMenuPolicy::DefaultContextMenu</enum>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="currentText">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string>Select Raid</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1573</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuaaa">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuZeal">
+    <property name="title">
+     <string>Zeal</string>
+    </property>
+    <addaction name="actionConnect"/>
+    <addaction name="actionDisconnect"/>
+   </widget>
+   <addaction name="menuaaa"/>
+   <addaction name="menuZeal"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionDisconnect">
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
