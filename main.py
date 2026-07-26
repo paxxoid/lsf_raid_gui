@@ -18,17 +18,9 @@ from helpers.app_state import AppState
 from helpers.logging_support import Logger
 from helpers.api_factory import APIClient, APIClientError
 from windows.player_search import  PlayerSearchWindow
+from windows.member_services import MemberServices
 
 
-
-# class DummyYamlConfig:
-#     def get_yaml_data(self, section, key, default=None):
-#         return default
-
-
-# class DummyLogger:
-#     def log_to_file(self, level, message):
-#         print(f"[{level}] {message}")
 
 
 class MainWindowApp:
@@ -67,9 +59,10 @@ class MainWindowApp:
 
         
         self.player_search_window = None
+        self.member_services = None
 
         self.client = APIClient(
-                base_url="https://lootandsomefun.com",
+                base_url=self.yaml_data.get_yaml_data("app_info", "general").get("lsf_baseurl"),
                 api_key= self.yaml_data.get_yaml_data("app_info", "general").get("lsf_apikey"),
             )        
 
@@ -139,17 +132,10 @@ class MainWindowApp:
         self.connect_action = self.window.findChild(QAction, "actionConnect")
         self.disconnect_action = self.window.findChild(QAction, "actionDisconnect")
         self.menu_player_search = self.window.findChild(QAction, "menu_player_search")
+        self.menu_member_services = self.window.findChild(QAction, "menu_member_services")
 
 
 
-        if self.text_zeal_output is None:
-            raise RuntimeError("Could not find text_zeal_output")
-        if self.text_zeal_rolls_output is None:
-            raise RuntimeError("Could not find rolls tab text browser")
-        if self.text_zeal_loot_output is None:
-            raise RuntimeError("Could not find loot tab text browser")
-        if self.text_raid_members is None:
-            raise RuntimeError("Could not find raid members text browser")
 
     def _connect_signals(self):
         self.connect_clear_button(self.clear_button, self.text_zeal_output)
@@ -159,6 +145,10 @@ class MainWindowApp:
         self.menu_player_search.triggered.connect(
             self._open_player_search
         )        
+
+        self.menu_member_services.triggered.connect(
+            self._open_member_services
+        )
 
         self.button_open_search.clicked.connect(
             self._open_player_search
@@ -230,6 +220,31 @@ class MainWindowApp:
                 print(exc)        
 
 
+    def _open_member_services(self):
+        # Do not create another copy if it is already open.
+        if self.member_services is not None:
+            self.member_services.show()
+            return
+
+        self.member_services = MemberServices(
+            self.yaml_data,
+            self.logger,
+            self.app_state,
+            self.client,
+            parent=self.window
+        )
+
+        self.member_services.window.destroyed.connect(
+            self._member_services_closed
+        )        
+
+        self.member_services.show()
+        
+
+    def _member_services_closed(self, *_):
+        self.member_services = None        
+
+
     def _open_player_search(self):
         # Do not create another copy if it is already open.
         if self.player_search_window is not None:
@@ -299,6 +314,13 @@ class MainWindowApp:
     def connect_to_zeal(self):
         if self.monitor is not None and self.monitor.running:
             self.text_zeal_output.append("Already connected to Zeal pipe")
+        
+            self.logger.log_to_file(
+                    "info",
+                    [
+                        f"Already connect to Zeal Pipes"
+                    ]
+                )                   
             return
 
         self.monitor = zeal_pipe_monitor(
@@ -310,11 +332,35 @@ class MainWindowApp:
 
         try:
             if self.monitor.start():
-                self.text_zeal_output.append("Connected to Zeal pipe")
+                self.logger.log_to_file(
+                        "info",
+                        [
+                            f"Connected to Zeal pipe!"
+                        ]
+                    )                       
+                    
             else:
-                self.text_zeal_output.append("Zeal pipe connection was not started")
+                #self.text_zeal_output.append("Zeal pipe connection was not started")
+                self.logger.log_to_file(
+                        "info",
+                        [
+                            f"Zeal pipe connection was not started!",
+                            f"Do you have zeal installed?"
+
+                        ]
+                    )                       
+                                    
         except Exception as error:
-            self.text_zeal_output.append(f"Could not connect to Zeal pipe: {error}")
+            #self.text_zeal_output.append(f"Could not connect to Zeal pipe: {error}")
+                self.logger.log_to_file(
+                        "ERROR",
+                        [
+                            f"Could not connect to Zeal pipe with the following error!",
+                            f"{error}"
+
+                        ]
+                    )                 
+            
 
     def disconnect_from_zeal(self):
         if self.monitor is None:
@@ -323,9 +369,22 @@ class MainWindowApp:
         if self.monitor.running:
             self.monitor.running = False
             self.monitor._close_pipe()
-            self.text_zeal_output.append("Disconnected from Zeal pipe")
+            
+            self.logger.log_to_file(
+                    "info",
+                    [
+                        f"Disconnected from Zeal pipe"
+                    ]
+                )                     
+            
         else:
-            self.text_zeal_output.append("Zeal pipe is not connected")
+            
+            self.logger.log_to_file(
+                    "info",
+                    [
+                        f"Zeal pipe is not connected"
+                    ]
+                )                
 
     def handle_pipe_batch(self, batch):
         #print(batch)
@@ -566,7 +625,7 @@ class MainWindowApp:
             self.logger.log_to_file(
                     "CRITICAL",
                     [
-                        f"Appliaction load!", 
+                        f"Appliaction loading error!!", 
                         f"ERROR: {e}"
                     ]
                 )                

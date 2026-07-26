@@ -39,7 +39,7 @@
       <enum>QTabWidget::TabShape::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="zeal_messages_tab">
       <attribute name="title">
@@ -548,6 +548,7 @@
      <string>Guild</string>
     </property>
     <addaction name="menu_player_search"/>
+    <addaction name="menu_member_services"/>
    </widget>
    <addaction name="menuaaa"/>
    <addaction name="menuZeal"/>
@@ -577,6 +578,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="menu_member_services">
+   <property name="text">
+    <string>Add/Update Member</string>
    </property>
   </action>
  </widget>

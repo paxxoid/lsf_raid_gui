@@ -6,7 +6,7 @@ app_info:
     version: 0.0.1
     desc: Handles excel file creation and email for daily disbution of year over year KPIs vs same week LY
     debug_mode: False
-    lsf_apikey: lasf_LGLjVSi6LbgbDOs4MbtFY8QS7YKCwrRFY6kjooPW_Z01
+    lsf_apikey: lasf_LGLjVSi6LbgbDOs4MbtFY8QS7YKCwrRFY6kjooPW_Z0
     lsf_baseurl: https://lootandsomefun.com
 
 
