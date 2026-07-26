@@ -115,9 +115,21 @@ class Logger(QObject):
         if not isinstance(messages, (list, tuple)):
             messages = [str(messages)]
 
-        level = level.upper()
+        normalized_messages = []
+
         for message in messages:
+            lines = str(message).splitlines()
+
+            if lines:
+                normalized_messages.extend(lines)
+            else:
+                normalized_messages.append("")        
+
+        level = level.upper()
+        for message in normalized_messages:
+
             self.application_log.append(f"[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] - [{level}] - {message}")
+
             match level:
                 case "DEBUG":
                     logging.debug(message)

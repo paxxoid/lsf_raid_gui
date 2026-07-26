@@ -81,7 +81,7 @@ class APIClient:
                 f"Response: {error_details}"
             )
 
-            self._log("ERROR", error_message)
+            #self._log("ERROR", error_message)
 
             raise APIClientError(error_message) from exc
 
@@ -207,8 +207,8 @@ class APIClient:
                 },
             )
         """
-        print(json_data)
-        print(json.dumps(json_data, indent=2))
+        #print(json_data)
+        #print(json.dumps(json_data, indent=2))
         return self._request(
             "PATCH",
             endpoint,

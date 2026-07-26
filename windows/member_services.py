@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from PySide6.QtCore import QFile, Qt
+from PySide6.QtCore import QFile, Qt, QDate
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
     QLineEdit,
@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
     QDateEdit,
     QCheckBox,
-    QSpinBox
+    QSpinBox, QMessageBox
 )
 
 from helpers.app_state import AppState
@@ -54,6 +54,9 @@ class MemberServices:
 
     def _connect_signals(self):
 
+        self.date_joined.setDate(
+            QDate.currentDate()
+        )
         self.button_save_data.clicked.connect(
             self._button_save_data
         )
@@ -93,6 +96,7 @@ class MemberServices:
             ckbox_raider = selected_data["raider"]
             ckbox_active = selected_data["active"]            
             character_main = selected_data['main_character']
+            joined = selected_data['joined_at']
             
 
             index = self.combo_character_type.findData(character_type)
@@ -145,81 +149,163 @@ class MemberServices:
                 self.check_active.setChecked(False)                
 
             self.member_level.setValue(selected_data['level'])
+
+            date_value = QDate.fromString(
+                str(joined),
+                "yyyy-MM-dd",
+            )
+
+            if date_value.isValid():
+                self.date_joined.setDate(date_value)
+
+            print(f"joined: {joined} - date_value {date_value} - date_value.isValid() {date_value.isValid()} ")
             
         
 
     def _button_save_data(self):
+        character_name = self.text_character_name.text().strip()
+        selected_data = self.combo_select_current_users.currentData()
+        main_character = self.combo_main_character.currentText()
+        selected_class = self.combo_class.currentText().lower()
+        selected_type = self.combo_character_type.currentText().lower()
+        select_rank = self.combo_guild_rank.currentText().lower()
+        active = self.check_active.isChecked()
+        raider = self.checkBox_raider.isChecked()
+        level = self.member_level.value()
+        bio = self.text_bio.toPlainText().strip()
+        race = self.combo_race.currentText().lower()
+        selected_date = self.date_joined.date().toString("yyyy-MM-dd")
+        current_date = datetime.now().strftime("%Y-%m-%d")
+
+        #main_character_id =  list(filter(lambda record: record.get("main_character_id") == main_character, self.app_state.PLAYER_RECORDS))
+
+        main_character_record = next(
+            (
+                record
+                for record in self.app_state.PLAYER_RECORDS
+                if record.get("character_name", "").casefold()
+                 == main_character.casefold()
+            ),
+             None,
+        )
+
+        main_character_id = (
+            main_character_record["id"]
+            if main_character_record
+            else None
+        )     
+
         if self.combo_select_current_users.currentIndex() > 0:  #update existing user
-            selected_data = self.combo_select_current_users.currentData()
-            main_character = self.combo_main_character.currentText()
-            selected_class = self.combo_class.currentText()
-            selected_type = self.combo_character_type.currentText()
-            select_rank = self.combo_guild_rank.currentText()
-            active = self.check_active.isChecked()
-            raider = self.checkBox_raider.isChecked()
-            level = self.member_level.value()
-            bio = self.text_bio.toPlainText().strip()
-            race = self.combo_race.currentText()
+   
+            # print("----- Member Form Debug -----")
+            # print(f"member_id: {selected_data['id']}")
+            # print(f"main_character_id {main_character_id}")
+            # print(f"main_character: {main_character!r} | type: {type(main_character).__name__}")
+            # print(f"selected_class: {selected_class!r} | type: {type(selected_class).__name__}")
+            # print(f"selected_type: {selected_type!r} | type: {type(selected_type).__name__}")
+            # print(f"select_rank: {select_rank!r} | type: {type(select_rank).__name__}")
+            # print(f"active: {active!r} | type: {type(active).__name__}")
+            # print(f"raider: {raider!r} | type: {type(raider).__name__}")
+            # print(f"level: {level!r} | type: {type(level).__name__}")
+            # print(f"bio: {bio!r} | type: {type(bio).__name__}")
+            # print(f"race: {race!r} | type: {type(race).__name__}")
+            # print("-----------------------------")
 
-            #main_character_id =  list(filter(lambda record: record.get("main_character_id") == main_character, self.app_state.PLAYER_RECORDS))
+            try:
 
-            main_character_record = next(
-                (
-                    record
-                    for record in self.app_state.PLAYER_RECORDS
-                    if record.get("character_name", "").casefold()
-                    == main_character.casefold()
-                ),
-                None,
-            )
+                results = self.api_client.patch (
+                            f"/api/v1/members/{selected_data['id']}",
+                            json_data={
+                                "character_type": selected_type,
+                                "main_character_id": main_character_id,
+                                "class_name": selected_class,
+                                "race": race,
+                                "level": level,
+                                "rank": select_rank,
+                                "active": active,
+                                "raider": raider,
+                                "bio": bio,
+                                "joined_at": selected_date
+                            }
+                )
+            
+                
+                if "id" in results:
+                    self.logger.log_to_file(
+                                "INFO", 
+                                    [
+                                        f"Member Updated!",
+                                        f"Update Info: {json.dumps(results, indent=2)}"
+                                    ]
+                                )
+                    QMessageBox.information(
+                        self.window,
+                        "Player Updated!",
+                        f"ID {results['id']} {results['character_name']} successfully updated! \n\n Review log tab for more details.",
+                    )                         
+                    self.app_state.load_app_state()
+            except Exception as e:
+                self.logger.log_to_file(
+                    "WARNING", 
+                        [
+                            f"API Error updating existing member!",
+                            f"The error: {str(e)}"
+                        ]
+                    )
+                QMessageBox.warning(
+                    self.window,
+                    "New player was NOT updated!",
+                    f"Review log tab for more details.",
+                    )                    
+        else:
+            try:
+                results = self.api_client.post (
+                            f"/api/v1/members/create",
+                            json_data={
+                                "character_name": character_name,
+                                "character_type": selected_type,
+                                "main_character_id": main_character_id,
+                                "class_name": selected_class,
+                                "race": race,
+                                "level": level,
+                                "rank": select_rank,
+                                "active": active,
+                                "raider": raider,
+                                "bio": bio,
+                                "joined_at": current_date
+                            }
+                )
+                
+                if "id" in results:
+                    self.logger.log_to_file(
+                                "INFO", 
+                                    [
+                                        f"Member Added!",
+                                        f"Update Info: {json.dumps(results, indent=2)}"
+                                    ]
+                                )  
+                    QMessageBox.information(
+                        self.window,
+                        "New player added!",
+                        f"ID {results['id']} - {results['character_name']} successfully Added! \n\n Review log tab for more details.",
+                    )                              
+                                
+                    self.app_state.load_app_state()
 
-            main_character_id = (
-                main_character_record["id"]
-                if main_character_record
-                else None
-            )            
-            print("----- Member Form Debug -----")
-            print(f"member_id: {selected_data['id']}")
-            print(f"main_character_id {main_character_id}")
-            print(f"main_character: {main_character!r} | type: {type(main_character).__name__}")
-            print(f"selected_class: {selected_class!r} | type: {type(selected_class).__name__}")
-            print(f"selected_type: {selected_type!r} | type: {type(selected_type).__name__}")
-            print(f"select_rank: {select_rank!r} | type: {type(select_rank).__name__}")
-            print(f"active: {active!r} | type: {type(active).__name__}")
-            print(f"raider: {raider!r} | type: {type(raider).__name__}")
-            print(f"level: {level!r} | type: {type(level).__name__}")
-            print(f"bio: {bio!r} | type: {type(bio).__name__}")
-            print(f"race: {race!r} | type: {type(race).__name__}")
-            print("-----------------------------")
-
-        try:
-
-            results = self.api_client.patch (
-                        f"/api/v1/members/{selected_data['id']}",
-                        json_data={
-                            "character_type": selected_type.lower(),
-                            "main_character_id": main_character_id,
-                            "class_name": selected_class.lower(),
-                            "race": race.lower(),
-                            "level": level,
-                            "rank": select_rank.lower(),
-                            "active": active,
-                            "raider": raider,
-                            "bio": bio
-                        }
-            )
-           
-            self.app_state.load_app_state()
-            print(results)
-            self.app_state.load_app_state()
-        except Exception as exc:
-            self.logger.log_to_file(
-                 "WARNING", 
-                    [
-                        f"API Error:",
-                        f"{exc}"
-                    ]
-                )        
+            except Exception as e:
+                self.logger.log_to_file(
+                    "WARNING", 
+                        [
+                            f"API Error adding a new member!",
+                            f"The error: {str(e)}"
+                        ]
+                    )     
+                QMessageBox.warning(
+                    self.window,
+                    "New player was NOT added!",
+                    f"Review log tab for more details.",
+                )    
+                    
 
 
 

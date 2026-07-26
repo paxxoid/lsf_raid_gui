@@ -203,7 +203,7 @@ class MainWindowApp:
             if self.text_raid_members.item(index).text().strip()
         ]        
 
-        character_names = ['Bard3', 'Bard4', 'Warrior1']
+        #character_names = ['Bard3', 'Bard4', 'Warrior1']
         try:
 
             results = self.client.post(
@@ -213,8 +213,21 @@ class MainWindowApp:
                             "character_names": character_names,
                         }
             )
-            self.app_state.load_app_state()
-            print(results)
+            
+            self.logger.log_to_file(
+                    "INFO", 
+                        [
+                            f"Raid Attendance Update!"
+                            f"NOTE: only know characters were updated. Those not on a the guild roster are ignored!",
+                            f"Update Info: {json.dumps(results, indent=2)}"
+                            ]
+                    )  
+            QMessageBox.information(
+                    self.window,
+                    "Raid Attendance Updated",
+                    f" {results['raid_event']}: Update - {results['added_count']}, ignored/already in the databse: {results['existing_count']}! \n\n PLEASE review log tab for more details.",
+            )                    
+            self.app_state.load_app_state()        
 
         except APIClientError as exc:
                 print(exc)        

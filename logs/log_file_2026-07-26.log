@@ -377,3 +377,266 @@ Response:
 [2026-07-26 03:18:13] - INFO - Loaded 84 player records from the API.
 [2026-07-26 03:18:13] - INFO - Loaded 6 raid attendance records from the API.
 [2026-07-26 03:18:13] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:18:22] - ERROR - eqgame.exe not found. Is EverQuest running?
+[2026-07-26 10:32:09] - INFO - Loaded 84 player records from the API.
+[2026-07-26 10:32:09] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:32:09] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:32:16] - INFO - Loaded 84 player records from the API.
+[2026-07-26 10:32:16] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:32:16] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:32:16] - INFO - Loaded 84 player records from the API.
+[2026-07-26 10:32:16] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:32:16] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:33:16] - INFO - Loaded 85 player records from the API.
+[2026-07-26 10:33:16] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:33:16] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:33:17] - INFO - Loaded 85 player records from the API.
+[2026-07-26 10:33:17] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:33:17] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:48:44] - INFO - Loaded 85 player records from the API.
+[2026-07-26 10:48:44] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:48:44] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:48:52] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Member Updated!
+[2026-07-26 10:48:52] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Update Info: {
+  "id": 64,
+  "character_name": "Bard4",
+  "character_type": "main",
+  "character_type_display": "Main",
+  "main_character_id": null,
+  "main_character": null,
+  "class_name": "bard",
+  "class_name_display": "Bard",
+  "race": "select race",
+  "level": 60,
+  "rank": "member",
+  "rank_display": "Member",
+  "active": true,
+  "raider": true,
+  "featured": false,
+  "joined_at": "2026-07-20",
+  "bio": "",
+  "last_raid_attended": null
+}
+[2026-07-26 10:49:02] - INFO - Loaded 85 player records from the API.
+[2026-07-26 10:49:02] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:49:02] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:49:54] - INFO - Loaded 85 player records from the API.
+[2026-07-26 10:49:54] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:49:54] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:49:59] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Member Updated!
+[2026-07-26 10:49:59] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Update Info: {
+  "id": 64,
+  "character_name": "Bard4",
+  "character_type": "main",
+  "character_type_display": "Main",
+  "main_character_id": null,
+  "main_character": null,
+  "class_name": "bard",
+  "class_name_display": "Bard",
+  "race": "select race",
+  "level": 60,
+  "rank": "member",
+  "rank_display": "Member",
+  "active": true,
+  "raider": false,
+  "featured": false,
+  "joined_at": "2026-07-20",
+  "bio": "",
+  "last_raid_attended": null
+}
+[2026-07-26 10:50:07] - INFO - Loaded 85 player records from the API.
+[2026-07-26 10:50:07] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:50:07] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:51:02] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Member Added!
+[2026-07-26 10:51:02] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Update Info: {
+  "id": 86,
+  "character_name": "testermain",
+  "character_type": "alt",
+  "character_type_display": "Alt",
+  "main_character_id": 62,
+  "main_character": "Bard2",
+  "class_name": "necromancer",
+  "class_name_display": "Necromancer",
+  "race": "erudite",
+  "level": 60,
+  "rank": "member",
+  "rank_display": "Member",
+  "active": true,
+  "raider": true,
+  "featured": false,
+  "joined_at": "2026-07-26",
+  "bio": "",
+  "last_raid_attended": null
+}
+[2026-07-26 10:51:10] - INFO - Loaded 86 player records from the API.
+[2026-07-26 10:51:10] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:51:10] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:51:27] - WARNING - API Error adding a new member!
+[2026-07-26 10:51:27] - WARNING - The error: API request failed.
+Status: 409
+URL: https://lootandsomefun.com/api/v1/members/create
+Response: {'detail': "A guild member named 'testermain' already exists."}
+[2026-07-26 10:55:42] - INFO - Loaded 86 player records from the API.
+[2026-07-26 10:55:42] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:55:42] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:56:36] - INFO - Loaded 86 player records from the API.
+[2026-07-26 10:56:36] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:56:36] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:56:42] - WARNING - API Error adding a new member!
+[2026-07-26 10:56:42] - WARNING - The error: ['API request failed.', 'Status: 409', 'URL: https://lootandsomefun.com/api/v1/members/create', 'Response: {\'detail\': "A guild member named \'Bard2\' already exists."}']
+[2026-07-26 10:58:48] - INFO - Loaded 86 player records from the API.
+[2026-07-26 10:58:48] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 10:58:48] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 10:58:55] - WARNING - API Error adding a new member!
+[2026-07-26 10:58:55] - WARNING - The error: API request failed.
+Status: 409
+URL: https://lootandsomefun.com/api/v1/members/create
+Response: {'detail': "A guild member named 'Bard2' already exists."}
+[2026-07-26 11:04:06] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:04:06] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:04:06] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:04:13] - WARNING - API Error adding a new member!
+[2026-07-26 11:04:13] - WARNING - The error: API request failed.
+[2026-07-26 11:04:13] - WARNING - Status: 409
+[2026-07-26 11:04:13] - WARNING - URL: https://lootandsomefun.com/api/v1/members/create
+[2026-07-26 11:04:13] - WARNING - Response: {'detail': "A guild member named 'Bard2' already exists."}
+[2026-07-26 11:04:22] - WARNING - API Error adding a new member!
+[2026-07-26 11:04:22] - WARNING - The error: API request failed.
+[2026-07-26 11:04:22] - WARNING - Status: 409
+[2026-07-26 11:04:22] - WARNING - URL: https://lootandsomefun.com/api/v1/members/create
+[2026-07-26 11:04:22] - WARNING - Response: {'detail': "A guild member named 'Bard2' already exists."}
+[2026-07-26 11:13:49] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:13:49] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:13:49] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:15:12] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:15:12] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:15:12] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:16:09] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:16:09] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:16:09] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:17:12] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:17:12] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:17:12] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:18:44] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:18:44] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:18:44] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Member Updated!
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO. Update Info: {
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "id": 64,
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "character_name": "Bard4",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "character_type": "main",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "character_type_display": "Main",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "main_character_id": null,
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "main_character": null,
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "class_name": "bard",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "class_name_display": "Bard",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "race": "select race",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "level": 60,
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "rank": "member",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "rank_display": "Member",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "active": true,
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "raider": false,
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "featured": false,
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "joined_at": "2026-07-20",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "bio": "",
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO.   "last_raid_attended": null
+[2026-07-26 11:18:55] - INFO - Unrecognized level: INNFO. Defaulting to INFO. }
+[2026-07-26 11:19:00] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:19:00] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:19:00] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:19:57] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:19:57] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:19:57] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:21:28] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:21:28] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:21:28] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:21:36] - WARNING - API Error updating existing member!
+[2026-07-26 11:21:36] - WARNING - The error: API request failed.
+[2026-07-26 11:21:36] - WARNING - Status: 422
+[2026-07-26 11:21:36] - WARNING - URL: https://lootandsomefun.com/api/v1/members/62
+[2026-07-26 11:21:36] - WARNING - Response: {'detail': [{'type': 'date_from_datetime_parsing', 'loc': ['body', 'payload', 'joined_at'], 'msg': 'Input should be a valid date or datetime, invalid character in year', 'ctx': {'error': 'invalid character in year'}}]}
+[2026-07-26 11:22:26] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:22:26] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:22:26] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:22:35] - INFO - Member Updated!
+[2026-07-26 11:22:35] - INFO - Update Info: {
+[2026-07-26 11:22:35] - INFO -   "id": 64,
+[2026-07-26 11:22:35] - INFO -   "character_name": "Bard4",
+[2026-07-26 11:22:35] - INFO -   "character_type": "main",
+[2026-07-26 11:22:35] - INFO -   "character_type_display": "Main",
+[2026-07-26 11:22:35] - INFO -   "main_character_id": null,
+[2026-07-26 11:22:35] - INFO -   "main_character": null,
+[2026-07-26 11:22:35] - INFO -   "class_name": "bard",
+[2026-07-26 11:22:35] - INFO -   "class_name_display": "Bard",
+[2026-07-26 11:22:35] - INFO -   "race": "select race",
+[2026-07-26 11:22:35] - INFO -   "level": 60,
+[2026-07-26 11:22:35] - INFO -   "rank": "member",
+[2026-07-26 11:22:35] - INFO -   "rank_display": "Member",
+[2026-07-26 11:22:35] - INFO -   "active": true,
+[2026-07-26 11:22:35] - INFO -   "raider": false,
+[2026-07-26 11:22:35] - INFO -   "featured": false,
+[2026-07-26 11:22:35] - INFO -   "joined_at": "2026-07-01",
+[2026-07-26 11:22:35] - INFO -   "bio": "",
+[2026-07-26 11:22:35] - INFO -   "last_raid_attended": null
+[2026-07-26 11:22:35] - INFO - }
+[2026-07-26 11:22:38] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:22:38] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:22:38] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:35:52] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:35:52] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:35:52] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:35:58] - INFO - Connecting to Zeal pipe: \\.\pipe\zeal_32300
+[2026-07-26 11:35:58] - INFO - Zeal pipe monitor started.
+[2026-07-26 11:35:58] - INFO - Connected to Zeal pipe.
+[2026-07-26 11:35:58] - INFO - Connected to Zeal pipe!
+[2026-07-26 11:37:23] - INFO - Member Updated!
+[2026-07-26 11:37:23] - INFO - Update Info: {
+[2026-07-26 11:37:23] - INFO -   "id": 64,
+[2026-07-26 11:37:23] - INFO -   "character_name": "Bard4",
+[2026-07-26 11:37:23] - INFO -   "character_type": "main",
+[2026-07-26 11:37:23] - INFO -   "character_type_display": "Main",
+[2026-07-26 11:37:23] - INFO -   "main_character_id": null,
+[2026-07-26 11:37:23] - INFO -   "main_character": null,
+[2026-07-26 11:37:23] - INFO -   "class_name": "bard",
+[2026-07-26 11:37:23] - INFO -   "class_name_display": "Bard",
+[2026-07-26 11:37:23] - INFO -   "race": "select race",
+[2026-07-26 11:37:23] - INFO -   "level": 60,
+[2026-07-26 11:37:23] - INFO -   "rank": "member",
+[2026-07-26 11:37:23] - INFO -   "rank_display": "Member",
+[2026-07-26 11:37:23] - INFO -   "active": true,
+[2026-07-26 11:37:23] - INFO -   "raider": true,
+[2026-07-26 11:37:23] - INFO -   "featured": false,
+[2026-07-26 11:37:23] - INFO -   "joined_at": "2026-07-01",
+[2026-07-26 11:37:23] - INFO -   "bio": "test",
+[2026-07-26 11:37:23] - INFO -   "last_raid_attended": null
+[2026-07-26 11:37:23] - INFO - }
+[2026-07-26 11:37:25] - INFO - Loaded 86 player records from the API.
+[2026-07-26 11:37:25] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:37:25] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:37:50] - INFO - Member Added!
+[2026-07-26 11:37:50] - INFO - Update Info: {
+[2026-07-26 11:37:50] - INFO -   "id": 87,
+[2026-07-26 11:37:50] - INFO -   "character_name": "NewMember123",
+[2026-07-26 11:37:50] - INFO -   "character_type": "alt",
+[2026-07-26 11:37:50] - INFO -   "character_type_display": "Alt",
+[2026-07-26 11:37:50] - INFO -   "main_character_id": 76,
+[2026-07-26 11:37:50] - INFO -   "main_character": "Beastlord3",
+[2026-07-26 11:37:50] - INFO -   "class_name": "cleric",
+[2026-07-26 11:37:50] - INFO -   "class_name_display": "Cleric",
+[2026-07-26 11:37:50] - INFO -   "race": "dwarf",
+[2026-07-26 11:37:50] - INFO -   "level": 55,
+[2026-07-26 11:37:50] - INFO -   "rank": "recruit",
+[2026-07-26 11:37:50] - INFO -   "rank_display": "Recruit",
+[2026-07-26 11:37:50] - INFO -   "active": true,
+[2026-07-26 11:37:50] - INFO -   "raider": false,
+[2026-07-26 11:37:50] - INFO -   "featured": false,
+[2026-07-26 11:37:50] - INFO -   "joined_at": "2026-07-26",
+[2026-07-26 11:37:50] - INFO -   "bio": "alt",
+[2026-07-26 11:37:50] - INFO -   "last_raid_attended": null
+[2026-07-26 11:37:50] - INFO - }
+[2026-07-26 11:37:53] - INFO - Loaded 87 player records from the API.
+[2026-07-26 11:37:53] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 11:37:53] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 11:45:02] - INFO - Loaded 87 player records from the API.
+[2026-07-26 11:45:02] - INFO - Loaded 7 raid attendance records from the API.
+[2026-07-26 11:45:02] - INFO - Loaded 5 loot records from the API.
