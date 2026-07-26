@@ -16,10 +16,13 @@ class APIClient:
         api_key_header: str = "X-API-Key",
         bearer_token: Optional[str] = None,
         timeout: int = 30,
+        logger=None
     ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self.logger=logger
         self.session = Session()
+
 
         self.session.headers.update(
             {
@@ -52,6 +55,17 @@ class APIClient:
             except ValueError:
                 error_details = response.text
 
+                self.logger.log_to_file(
+                            "ERROR", 
+                            [
+                                f"API request failed.\n"
+                                f"Status: {response.status_code}\n"
+                                f"URL: {response.url}\n"
+                                f"Response: {error_details}"
+                             
+                            ]
+                        )                
+
             raise APIClientError(
                 f"API request failed.\n"
                 f"Status: {response.status_code}\n"
@@ -66,6 +80,17 @@ class APIClient:
         try:
             return response.json()
         except ValueError as exc:
+            self.logger.log_to_file(
+                        "ERROR", 
+                        [
+                            f"API request failed.\n"
+                            f"Status: {response.status_code}\n"
+                            f"URL: {response.url}\n"
+                            f"Response: {error_details}"
+                             
+                        ]
+                    )  
+
             raise APIClientError(
                 f"API returned a non-JSON response.\n"
                 f"Status: {response.status_code}\n"
@@ -95,7 +120,16 @@ class APIClient:
                 params=params,
                 timeout=self.timeout,
             )
+        except Exception as e:
+            self.logger.log_to_file(
+                    "CRITICAL",
+                    [
+                        f"Email error!", 
+                        f"ERROR: {e}"
+                    ]
+                )
         except requests.RequestException as exc:
+            
             raise APIClientError(f"Unable to connect to {url}: {exc}") from exc
 
         return self._handle_response(response)
@@ -129,6 +163,7 @@ class APIClient:
             )
         except requests.RequestException as exc:
             raise APIClientError(f"Unable to connect to {url}: {exc}") from exc
+        
 
         return self._handle_response(response)
 

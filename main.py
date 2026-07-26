@@ -6,26 +6,29 @@ import time
 from pathlib import Path
 from datetime import datetime
 
-from PySide6.QtCore import QFile, QTimer
+from PySide6.QtCore import QFile, QTimer, Qt
 from PySide6.QtGui import QAction
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QTabWidget, QTextBrowser, QPushButton, QTextEdit, QListWidget, QComboBox, QLabel
+from PySide6.QtWidgets import QApplication, QTabWidget, QTextBrowser, QPushButton, QTextEdit, QListWidget, QComboBox, QLabel, QProgressBar, QMessageBox
 from PySide6.QtGui import QTextCursor
 
 from helpers.zeal_pipes import zeal_pipe_monitor
 from helpers.yaml_support import YAMLParser
 from helpers.app_state import AppState
 from helpers.logging_support import Logger
+from helpers.api_factory import APIClient, APIClientError
+from windows.player_search import  PlayerSearchWindow
 
 
-class DummyYamlConfig:
-    def get_yaml_data(self, section, key, default=None):
-        return default
+
+# class DummyYamlConfig:
+#     def get_yaml_data(self, section, key, default=None):
+#         return default
 
 
-class DummyLogger:
-    def log_to_file(self, level, message):
-        print(f"[{level}] {message}")
+# class DummyLogger:
+#     def log_to_file(self, level, message):
+#         print(f"[{level}] {message}")
 
 
 class MainWindowApp:
@@ -48,25 +51,32 @@ class MainWindowApp:
         logging_rot_length = self.yaml_data.get_yaml_data('logging','rotation')
         logging_rot_max_days_length = self.yaml_data.get_yaml_data('logging','rotation_max_days')
         
+        
         self.logger = Logger(
             log_dir=logging_dir,
             log_file=logging_file,
             console_output=logging_console_output,
             rot_length=logging_rot_length,
             backup_count=logging_rot_max_days_length,
-            debug_mode=self.debug_mode
+            debug_mode=self.debug_mode,
+            window=self.window
         )
         self.logger.configure_logging()    
 
-        self.app_state = AppState(self.logger)
+        self.app_state = AppState(self.logger, self.yaml_data)
 
         
+        self.player_search_window = None
 
-        
+        self.client = APIClient(
+                base_url="https://lootandsomefun.com",
+                api_key= self.yaml_data.get_yaml_data("app_info", "general").get("lsf_apikey"),
+            )        
 
         self._setup_widget_references()
         self._connect_signals()
         self._load_raids_from_api()
+        
 
         self.monitor = None
 
@@ -98,8 +108,11 @@ class MainWindowApp:
         self.text_zeal_rolls_output = self.window.findChild(QTextBrowser, "text_zeal_rolls")
         self.clear_rolls_button = self.window.findChild(QPushButton, "button_zeal_rolls_output_clear")
 
+
         self.text_zeal_loot_output = self.window.findChild(QTextBrowser, "text_zeal_loot")
         self.clear_loot_button = self.window.findChild(QPushButton, "button_zeal_loot_output_clear")
+
+        self.application_log = self.window.findChild(QProgressBar, "application_log")
 
         self.text_raid_members = self.window.findChild(QListWidget, "text_raid_members")
 
@@ -112,10 +125,22 @@ class MainWindowApp:
         self.label_raid_end = self.window.findChild(QLabel,"label_raid_end")
         self.label_raid_zone = self.window.findChild(QLabel,"label_raid_zone")
 
+        self.label_currnet_target = self.window.findChild(QLabel, "label_currnet_target")
+        self.target_health_bar = self.window.findChild(QProgressBar, "target_health_bar")
+
+        self.label_my_current_zone = self.window.findChild(QLabel, "label_my_current_zone")
+        self.label_players_in_zone = self.window.findChild(QLabel, "label_players_in_zone")
+
+        self.button_open_search = self.window.findChild(QPushButton, "button_open_search")
+        self.button_update_db_raid = self.window.findChild(QPushButton, "button_update_db_raid")
+
 
 
         self.connect_action = self.window.findChild(QAction, "actionConnect")
         self.disconnect_action = self.window.findChild(QAction, "actionDisconnect")
+        self.menu_player_search = self.window.findChild(QAction, "menu_player_search")
+
+
 
         if self.text_zeal_output is None:
             raise RuntimeError("Could not find text_zeal_output")
@@ -131,9 +156,27 @@ class MainWindowApp:
         self.connect_clear_button(self.clear_rolls_button, self.text_zeal_rolls_output)
         self.connect_clear_button(self.clear_loot_button, self.text_zeal_loot_output)
 
+        self.menu_player_search.triggered.connect(
+            self._open_player_search
+        )        
+
+        self.button_open_search.clicked.connect(
+            self._open_player_search
+
+        )
+
+        self.button_update_db_raid.clicked.connect(
+            self._update_raid_attendance
+
+        )        
         self.raids_scheduled_combo.currentIndexChanged.connect(
                 self._populate_raid_details
-                )
+        )
+
+        self.text_raid_members.itemDoubleClicked.connect(
+            self._player_double_clicked
+        )
+        
 
 
         if self.connect_action is not None:
@@ -143,6 +186,89 @@ class MainWindowApp:
 
         self.timer.timeout.connect(self.flush_monitor_messages)
         self.timer.start(250)
+
+    def _update_raid_attendance(self):
+        index = self.raids_scheduled_combo.currentIndex()
+        if index == -1:
+            QMessageBox.critical(
+                self.window,
+                "Error",
+                "You need to select a raid \n before updating the database!.",
+            )
+            self.logger.log_to_file(
+                 "WARNING", 
+                    [
+                        f"Database was no updated, please select Raid Event first from the dropdown.",
+                    ]
+                )                        
+            return
+
+        data = self.raids_scheduled_combo.itemData(index)
+        
+        self.selected_raid_event_id = data['id']    
+
+        character_names = [
+            self.text_raid_members.item(index).text().strip()
+            for index in range(self.text_raid_members.count())
+            if self.text_raid_members.item(index).text().strip()
+        ]        
+
+        character_names = ['Bard3', 'Bard4', 'Warrior1']
+        try:
+
+            results = self.client.post(
+                        "/api/v1/attendance/add",
+                        json_data={
+                            "raid_event_id": data['id'],
+                            "character_names": character_names,
+                        }
+            )
+            self.app_state.load_app_state()
+            print(results)
+
+        except APIClientError as exc:
+                print(exc)        
+
+
+    def _open_player_search(self):
+        # Do not create another copy if it is already open.
+        if self.player_search_window is not None:
+            self.player_search_window.show()
+            return
+
+        self.player_search_window = PlayerSearchWindow(
+            self.yaml_data,
+            self.logger,
+            self.app_state,
+            parent=self.window
+        )
+
+        self.player_search_window.window.destroyed.connect(
+            self._player_search_closed
+        )        
+
+        self.player_search_window.show()
+        
+
+    def _player_search_closed(self, *_):
+        self.player_search_window = None
+
+    def _player_search_window_closed(self):
+        self.player_search_window = None        
+
+
+    def _player_double_clicked(self, item):
+        player_name = item.text().strip()
+
+        self._open_player_search()
+
+
+        self.player_search_window.text_player_search.setText(
+            player_name
+        )
+
+        self.player_search_window.button_search.click()
+
 
     def _populate_raid_details(self, index):
 
@@ -175,7 +301,11 @@ class MainWindowApp:
             self.text_zeal_output.append("Already connected to Zeal pipe")
             return
 
-        self.monitor = zeal_pipe_monitor(self.window, DummyYamlConfig(), DummyLogger())
+        self.monitor = zeal_pipe_monitor(
+            self.window,
+            self.yaml_data,
+            self.logger,
+        )
         self.monitor.register_gui_sink(self.handle_pipe_batch)
 
         try:
@@ -208,9 +338,10 @@ class MainWindowApp:
                 continue
 
             numeric_type = self._get_message_type(message)
-            if numeric_type == 28:
-                print(f"#################################### target? :{message} ")
+            if numeric_type == 28 or numeric_type == 29:
+               self._target_message_parse(message)
 
+                
 
 
             if numeric_type == 281:
@@ -235,6 +366,43 @@ class MainWindowApp:
 
             #target.append(self._format_message(message))
 
+    # def _target_message_parse(self, message):
+    #         data = message.get("data") if isinstance(message, dict) else None
+    #         numeric_type = self._get_message_type(message)
+    #         if numeric_type == 28 or numeric_type == 29:
+    #             self.label_currnet_target.setText(data[0]['value'])
+    #             self.target_health_bar.setValue(int(data[1]['value']))                
+
+    def _target_message_parse(self, message):
+        if not isinstance(message, dict):
+            return
+
+        data = message.get("data")
+        numeric_type = self._get_message_type(message)
+
+        if numeric_type not in (28, 29):
+            return
+
+        if not isinstance(data, list) or len(data) < 2:
+            return
+
+        if not isinstance(data[0], dict) or not isinstance(data[1], dict):
+            return
+
+        target_name = data[0].get("value")
+        health_value = data[1].get("value")
+
+        if target_name:
+            self.label_currnet_target.setText(str(target_name))
+
+        try:
+            health = int(health_value)
+        except (TypeError, ValueError):
+            return
+
+        self.target_health_bar.setValue(health)    
+
+
     def _get_message_type(self, message):
         if not isinstance(message, dict):
             return None
@@ -247,6 +415,7 @@ class MainWindowApp:
 
         data = message.get("data")
         return self._find_nested_message_type(data)
+        
 
     def _find_nested_message_type(self, value):
         if isinstance(value, dict):
@@ -275,6 +444,16 @@ class MainWindowApp:
         match = re.search(r"\]\s+([^(<]+?)\s*(?:\(|<|$)", data['text'])
         name = match.group(1).strip() if match else None
 
+        match = re.search(
+            r"There (?:are|is) (?P<count>\d+) players? in (?P<zone>.+?)\.$",
+            message["data"]["text"],
+        )
+        if match:
+            self.label_my_current_zone.setText(match.group("zone"))
+            self.label_players_in_zone.setText(match.group("count"))
+                    
+
+
         current_time = time.monotonic()
 
         if self.last_who_name_time is  None:
@@ -283,7 +462,7 @@ class MainWindowApp:
         if self.last_who_name_time is not None:
             elapsed = current_time - self.last_who_name_time
 
-            print(f"Seconds since last name: {elapsed:.2f}")
+            #print(f"Seconds since last name: {elapsed:.2f}")
 
             self.last_who_name_time = time.monotonic()
 
@@ -292,10 +471,10 @@ class MainWindowApp:
                 self.text_raid_members.clear()
 
 
-        print(f"data: {data}")
-        print(f"data[text]: {data['text']}")
-        print(f"matrch {match}")
-        print(f"name {name}")
+        #print(f"data: {data}")
+        #print(f"data[text]: {data['text']}")
+        #print(f"matrch {match}")
+        #print(f"name {name}")
         if name:
             self.text_raid_members.addItem(name)
 
@@ -361,29 +540,38 @@ class MainWindowApp:
         return cleaned
 
     def _load_raids_from_api(self):
-        for raids in self.app_state.raid_scheduled:
-            formatted_date = datetime.fromisoformat(
-                    raids['start_at'].replace("Z", "+00:00")
-                ).strftime("%m/%d/%Y")  
-            formatted_time_start = datetime.fromisoformat(
-                    raids['start_at'].replace("Z", "+00:00")
-                ).strftime("%I:%M %p")     
-            formatted_time_end = datetime.fromisoformat(
-                    raids['end_at'].replace("Z", "+00:00")
-                ).strftime("%I:%M %p")                   
-                         
-            self.raids_scheduled_combo.addItem(f"{raids['title']} -  {formatted_date}", 
-                                               {
-                                                    "id": raids['id'],
-                                                    "title": raids['title'],
-                                                    "start_at": formatted_time_start,
-                                                    "end_at":formatted_time_end,
-                                                    "zone": raids['zone'],
-                                                    "date": formatted_date
-                                                }
-                                            )
-#            print(raids)
-        pass
+        try:
+            for raids in self.app_state.raid_scheduled:
+                formatted_date = datetime.fromisoformat(
+                        raids['start_at'].replace("Z", "+00:00")
+                    ).strftime("%m/%d/%Y")  
+                formatted_time_start = datetime.fromisoformat(
+                        raids['start_at'].replace("Z", "+00:00")
+                    ).strftime("%I:%M %p")     
+                formatted_time_end = datetime.fromisoformat(
+                        raids['end_at'].replace("Z", "+00:00")
+                    ).strftime("%I:%M %p")                   
+                            
+                self.raids_scheduled_combo.addItem(f"{raids['title']} -  {formatted_date}", 
+                                                {
+                                                        "id": raids['id'],
+                                                        "title": raids['title'],
+                                                        "start_at": formatted_time_start,
+                                                        "end_at":formatted_time_end,
+                                                        "zone": raids['zone'],
+                                                        "date": formatted_date
+                                                    }
+                                                )
+        except Exception as e:
+            self.logger.log_to_file(
+                    "CRITICAL",
+                    [
+                        f"Appliaction load!", 
+                        f"ERROR: {e}"
+                    ]
+                )                
+
+   
 
     def connect_clear_button(self, button, widget):
         if button is not None and widget is not None:

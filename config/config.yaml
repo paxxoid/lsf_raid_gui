@@ -5,8 +5,9 @@ app_info:
     name: lsf_raid_helper_gui
     version: 0.0.1
     desc: Handles excel file creation and email for daily disbution of year over year KPIs vs same week LY
-    debug_mode: True
-    lsf_apikey: lasf_LGLjVSi6LbgbDOs4MbtFY8QS7YKCwrRFY6kjooPW_Z0
+    debug_mode: False
+    lsf_apikey: lasf_LGLjVSi6LbgbDOs4MbtFY8QS7YKCwrRFY6kjooPW_Z01
+    lsf_baseurl: https://lootandsomefun.com
 
 
     required_directories:
@@ -30,5 +31,6 @@ logging:
 zeal_pipes:
   reconnect_delay: 2
   zeal_types_to_relay_base: [0, 1]
-  zeal_types_to_relay_sub: [28, 29, 281, 287, 286]
+  zeal_log_types_to_relay: [281, 286, 287]
+  zeal_label_types_to_relay: [28, 29]
 

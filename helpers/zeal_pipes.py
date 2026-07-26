@@ -51,12 +51,26 @@ class zeal_pipe_monitor:
 
         self.message_buffer = ""
         self.gui_sink = None
-        self.zeal_types_to_relay_sub = self._get_yaml_data(
+        legacy_sub_types = self._get_yaml_data(
             'zeal_pipes',
             'zeal_types_to_relay_sub',
             [28, 29, 281, 286, 287],
         )
-        self.zeal_types_to_relay = set(self._get_yaml_data(
+        self.zeal_log_types_to_relay = self._as_int_set(
+            self._get_yaml_data(
+                'zeal_pipes',
+                'zeal_log_types_to_relay',
+                legacy_sub_types,
+            )
+        )
+        self.zeal_label_types_to_relay = self._as_int_set(
+            self._get_yaml_data(
+                'zeal_pipes',
+                'zeal_label_types_to_relay',
+                [28, 29],
+            )
+        )
+        self.zeal_types_to_relay = self._as_int_set(self._get_yaml_data(
             'zeal_pipes',
             'zeal_types_to_relay_base',
             [
@@ -77,6 +91,25 @@ class zeal_pipe_monitor:
             return getter(section, key, default)
 
         return default
+
+    @staticmethod
+    def _as_int_set(values):
+        """Normalize a YAML scalar/list into a set of integer type values."""
+        if values is None:
+            return set()
+
+        if not isinstance(values, (list, tuple, set)):
+            values = [values]
+
+        normalized_values = set()
+
+        for value in values:
+            try:
+                normalized_values.add(int(value))
+            except (TypeError, ValueError):
+                continue
+
+        return normalized_values
 
     def register_gui_sink(self, sink):
         self.gui_sink = sink
@@ -407,9 +440,12 @@ class zeal_pipe_monitor:
         """
         Convert one Zeal outer JSON object into a normalized dictionary.
 
-        zeal_types_to_relay contains the inner Zeal data types to retain,
-        such as:
+        Outer message categories and their sub-types have separate filters.
+        For example:
 
+            1   = Label
+            28  = TargetName
+            29  = TargetHPPerc
             281 = WhoCommand
             286 = LootMessage
             287 = DiceRoll
@@ -446,39 +482,70 @@ class zeal_pipe_monitor:
         # Label messages
         #
         if raw_event_type == PipeMessageType.Label.value:
-            # Zeal normally places the LabelType in the outer "value"
-            # field. Accept a nested "type" or "label_type" as well so
-            # both observed payload layouts are handled.
+            # Zeal commonly puts LabelType in the outer "value" field.
+            # Also accept the nested layouts emitted by other versions.
             inner_type = outer_data.get("value")
 
             if isinstance(inner_data, dict):
                 inner_type = inner_data.get(
-                    "type",
-                    inner_data.get("label_type", inner_type),
+                    "label_type",
+                    inner_data.get("type", inner_type),
                 )
+
+            elif isinstance(inner_data, list):
+                filtered_items = []
+                discovered_types = set()
+
+                for item in inner_data:
+                    if not isinstance(item, dict):
+                        continue
+
+                    item_type = item.get(
+                        "label_type",
+                        item.get("type"),
+                    )
+
+                    try:
+                        item_type = int(item_type)
+                    except (TypeError, ValueError):
+                        continue
+
+                    if item_type in self.zeal_label_types_to_relay:
+                        filtered_items.append(item)
+                        discovered_types.add(item_type)
+
+                if not filtered_items:
+                    return None
+
+                inner_data = filtered_items
+
+                if inner_type is None and discovered_types:
+                    inner_type = next(iter(discovered_types))
 
             try:
                 inner_type = int(inner_type)
             except (TypeError, ValueError):
                 return None
 
-            if inner_type not in self.zeal_types_to_relay_sub:
+            if inner_type not in self.zeal_label_types_to_relay:
                 return None
 
             label_type = LabelType.from_value(inner_type)
 
-            if label_type not in (
-                LabelType.TargetName,
-                LabelType.TargetHPPerc,
-            ):
-                return None
-
             return {
                 "character": outer_data.get("character"),
                 "event_type": raw_event_type,
-                "event_type_name": event_type.name,
+                "event_type_name": (
+                    event_type.name
+                    if event_type is not None
+                    else "Unknown"
+                ),
                 "type": inner_type,
-                "type_name": label_type.name,
+                "type_name": (
+                    label_type.name
+                    if label_type is not None
+                    else "Unknown"
+                ),
                 "data_len": outer_data.get("data_len"),
                 "data": inner_data,
             }
@@ -507,7 +574,7 @@ class zeal_pipe_monitor:
                     except (TypeError, ValueError):
                         continue
 
-                    if item_type in self.zeal_types_to_relay_sub:
+                    if item_type in self.zeal_log_types_to_relay:
                         filtered_items.append(item)
                         discovered_types.add(item_type)
 
@@ -527,14 +594,11 @@ class zeal_pipe_monitor:
 
             if (
                 isinstance(inner_data, dict)
-                and inner_type not in self.zeal_types_to_relay_sub
+                and inner_type not in self.zeal_log_types_to_relay
             ):
                 return None
 
             log_type = LogType.from_value(inner_type)
-
-            if inner_type == "281":  #/who command
-                pass
 
             return {
                 "character": outer_data.get("character"),

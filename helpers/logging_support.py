@@ -4,7 +4,12 @@ from logging.handlers import RotatingFileHandler
 from datetime import datetime
 
 
-class Logger:
+from PySide6.QtWidgets import QTextBrowser, QWidget
+from PySide6.QtCore import QObject, Signal
+
+
+class Logger(QObject):
+    gui_log_message = Signal(str)
     def __init__(
         self,
         rot_length=None,
@@ -12,8 +17,10 @@ class Logger:
         log_file=None,
         console_output=False,
         debug_mode=False,
-        backup_count=5
+        backup_count=5,
+        window=None
     ):
+        super().__init__()
         if log_dir is None:
             log_dir = "log"
 
@@ -31,6 +38,31 @@ class Logger:
         self.log_file_path = os.path.join(log_dir, log_file)
         self.console_output = console_output
         self.debug_mode = debug_mode
+        self.window = window
+
+        self.application_log = None
+
+        for widget in self.window.findChildren(QWidget):
+            if "log" in widget.objectName().lower():
+                print(
+                    widget.objectName(),
+                    type(widget).__name__,
+                )
+            self.application_log = self.window.findChild(
+                QTextBrowser,
+                "application_log",
+            )
+
+            if self.application_log is None:
+                raise RuntimeError(
+                    "QTextBrowser named application_log was not found"
+                )
+
+            self.gui_log_message.connect(
+                self.application_log.append
+            ) 
+
+       
 
     def configure_logging(self):
         log_dir = os.path.dirname(self.log_file_path)
@@ -84,11 +116,12 @@ class Logger:
             messages = [str(messages)]
 
         level = level.upper()
-
         for message in messages:
+            self.application_log.append(f"[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] - [{level}] - {message}")
             match level:
                 case "DEBUG":
                     logging.debug(message)
+
                 case "INFO":
                     logging.info(message)
                 case "WARNING":
@@ -101,3 +134,4 @@ class Logger:
                     logging.info(
                         f"Unrecognized level: {level}. Defaulting to INFO. {message}"
                     )
+        

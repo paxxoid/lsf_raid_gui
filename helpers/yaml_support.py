@@ -25,14 +25,14 @@ class YAMLParser:
             print(f"Error parsing YAML file: {e}")
             return None
 
-    def get_yaml_data(self, category, name):
+    def get_yaml_data(self, category, name, default=None):
         if not self.data:
-            return None
+            return default
 
         if category in self.data:
-            return self.data[category].get(name, None)
+            return self.data[category].get(name, default)
         else:
-            return None
+            return default
 
     def update_yaml_data(self, keys, value):
         if self.data is None:

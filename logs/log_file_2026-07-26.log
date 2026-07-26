@@ -1,0 +1,38 @@
+[2026-07-26 00:01:04] - INFO - Loaded 83 player records from the API.
+[2026-07-26 00:01:04] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 00:01:04] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 00:01:16] - INFO - Loaded 0 player records from the API.
+[2026-07-26 00:01:16] - INFO - Loaded 0 raid attendance records from the API.
+[2026-07-26 00:01:16] - INFO - Loaded 0 loot records from the API.
+[2026-07-26 00:02:50] - INFO - Loaded 0 player records from the API.
+[2026-07-26 00:02:50] - INFO - Loaded 0 raid attendance records from the API.
+[2026-07-26 00:02:50] - INFO - Loaded 0 loot records from the API.
+[2026-07-26 00:03:37] - CRITICAL - Email error!
+[2026-07-26 00:03:37] - CRITICAL - ERROR: API request failed.
+Status: 401
+URL: https://lootandsomefun.com/api/v1/members?limit=100&offset=0
+Response: {'detail': 'Unauthorized'}
+[2026-07-26 00:03:37] - INFO - Loaded 0 player records from the API.
+[2026-07-26 00:03:37] - INFO - Loaded 0 raid attendance records from the API.
+[2026-07-26 00:03:37] - INFO - Loaded 0 loot records from the API.
+[2026-07-26 00:03:46] - INFO - Loaded 83 player records from the API.
+[2026-07-26 00:03:46] - INFO - Loaded 6 raid attendance records from the API.
+[2026-07-26 00:03:46] - INFO - Loaded 5 loot records from the API.
+[2026-07-26 00:05:19] - CRITICAL - Email error!
+[2026-07-26 00:05:19] - CRITICAL - ERROR: API request failed.
+Status: 401
+URL: https://lootandsomefun.com/api/v1/members?limit=100&offset=0
+Response: {'detail': 'Unauthorized'}
+[2026-07-26 00:05:19] - INFO - Loaded 0 player records from the API.
+[2026-07-26 00:05:19] - INFO - Loaded 0 raid attendance records from the API.
+[2026-07-26 00:05:19] - INFO - Loaded 0 loot records from the API.
+[2026-07-26 00:06:17] - CRITICAL - Email error!
+[2026-07-26 00:06:17] - CRITICAL - ERROR: API request failed.
+Status: 401
+URL: https://lootandsomefun.com/api/v1/members?limit=100&offset=0
+Response: {'detail': 'Unauthorized'}
+[2026-07-26 00:06:17] - INFO - Loaded 0 player records from the API.
+[2026-07-26 00:06:17] - INFO - Loaded 0 raid attendance records from the API.
+[2026-07-26 00:06:17] - INFO - Loaded 0 loot records from the API.
+[2026-07-26 00:06:17] - CRITICAL - Email error!
+[2026-07-26 00:06:17] - CRITICAL - ERROR: 'AppState' object has no attribute 'raid_scheduled'
