@@ -43,6 +43,9 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="text_player_search"/>
+      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
@@ -59,9 +62,6 @@
          <string>Select Member</string>
         </property>
        </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="text_player_search"/>
       </item>
      </layout>
     </widget>
@@ -91,30 +91,46 @@
       </item>
      </layout>
     </widget>
-    <widget class="QLabel" name="label_no_records_found">
+    <widget class="QWidget" name="formLayoutWidget_5">
      <property name="geometry">
       <rect>
-       <x>170</x>
-       <y>100</y>
-       <width>151</width>
-       <height>16</height>
+       <x>120</x>
+       <y>90</y>
+       <width>244</width>
+       <height>31</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <pointsize>13</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: RED;</string>
-     </property>
-     <property name="text">
-      <string>No records Found</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignCenter</set>
-     </property>
+     <layout class="QFormLayout" name="formLayout_5">
+      <property name="horizontalSpacing">
+       <number>18</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_no_records_found">
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: RED;</string>
+        </property>
+        <property name="text">
+         <string>No records Found</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="button_not_found_adduser">
+        <property name="text">
+         <string>Add user</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">

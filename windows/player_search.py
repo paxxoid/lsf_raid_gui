@@ -15,19 +15,23 @@ from PySide6.QtWidgets import (
 )
 
 from helpers.app_state import AppState
+from windows.member_services import MemberServices
+
 
 
 class PlayerSearchWindow:
-    def __init__(self,  yaml_data, logger, app_state, parent=None,):
+    def __init__(self,  yaml_data, logger, app_state, api_client, parent=None,):
         self.window = self._load_window(parent)
         self.yaml_data = yaml_data
         self.logger = logger
         self.app_state = app_state
+        self.api_client = api_client
 
         self._setup_widget_references()
         self._connect_signals()
         self._load_player_combo()
         self._setup_player_search()
+        self.member_services = None
 
 
     def _setup_widget_references(self):        
@@ -44,7 +48,7 @@ class PlayerSearchWindow:
         self.label_member_loot_awarded = self.window.findChild(QLabel, "label_member_loot_awarded")
         self.label_member_last_looted = self.window.findChild(QLabel, "label_member_last_looted")
         self.label_no_records_found = self.window.findChild(QLabel, "label_no_records_found")
-
+        self.button_not_found_adduser = self.window.findChild(QPushButton, "button_not_found_adduser")
         
 
 
@@ -97,11 +101,52 @@ class PlayerSearchWindow:
             self._search_player
         )
 
+        self.button_not_found_adduser.clicked.connect(
+            self._not_found_button
+        )
+
+
+
         self.label_no_records_found.hide()
+        self.button_not_found_adduser.hide()
+
+    def _not_found_button(self):
+        player_name = self.text_player_search.text().strip()
+
+        self._open_member_services()
+
+        self.member_services.text_character_name.setText(
+                player_name
+            )
+        
+    def _open_member_services(self):
+        # Do not create another copy if it is already open.
+        if self.member_services is not None:
+            self.member_services.show()
+            return
+
+        self.member_services = MemberServices(
+            self.yaml_data,
+            self.logger,
+            self.app_state,
+            self.api_client,
+            parent=self.window
+        )
+
+        self.member_services.window.destroyed.connect(
+            self._member_services_closed
+        )        
+
+        self.member_services.show()
+
+    def _member_services_closed(self, *_):
+        self.member_services = None                       
+
 
     def _search_player(self):
 
         self.label_no_records_found.hide()
+        self.button_not_found_adduser.hide()
         if  (not self.text_player_search.text().strip()
             and self.combo_player_select.currentText() == "Select Member"):
             return
@@ -128,6 +173,7 @@ class PlayerSearchWindow:
 
         if selected_player is None:
             self.label_no_records_found.show()
+            self.button_not_found_adduser.show()
             return
 
         player_loot_records =  list(filter(lambda record: record.get("member_id") == selected_player.get("id"), self.app_state.loot_records))

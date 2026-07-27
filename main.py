@@ -56,22 +56,22 @@ class MainWindowApp:
         self.logger.configure_logging()    
 
         self.app_state = AppState(self.logger, self.yaml_data)
-
-        
-        self.player_search_window = None
-        self.member_services = None
-
+   
         self.client = APIClient(
                 base_url=self.yaml_data.get_yaml_data("app_info", "general").get("lsf_baseurl"),
                 api_key= self.yaml_data.get_yaml_data("app_info", "general").get("lsf_apikey"),
             )        
+
+        self.player_search_window = None
+        self.member_services = None    
+        self.monitor = None    
 
         self._setup_widget_references()
         self._connect_signals()
         self._load_raids_from_api()
         
 
-        self.monitor = None
+        
 
     def _load_window(self):
         ui_path = Path(__file__).with_name("main_window.ui")
@@ -268,6 +268,7 @@ class MainWindowApp:
             self.yaml_data,
             self.logger,
             self.app_state,
+            self.client,
             parent=self.window
         )
 

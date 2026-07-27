@@ -1,32 +1,13 @@
-try:
-    import psutil
-except ImportError:  # pragma: no cover - environment fallback
-    psutil = None
 
-try:
-    import pywintypes
-except ImportError:  # pragma: no cover - environment fallback
-    pywintypes = None
-
-try:
-    import win32file
-except ImportError:  # pragma: no cover - environment fallback
-    win32file = None
-
+import psutil
+import pywintypes    
+import win32file
 import threading
 import time
 import queue
 import json
 
 from helpers.zeal_enums import ZealIntEnum, PipeMessageType, LogType, resolve_pipe_value, LabelType
-
-try:
-    from windows.error_window import show_error
-except ImportError:  # pragma: no cover - fallback for non-Windows/dev environments
-    def show_error(parent, message, title=None):
-        return None
-
-pywintypes_error = pywintypes.error if pywintypes is not None else Exception
 
 
 class zeal_pipe_monitor:
