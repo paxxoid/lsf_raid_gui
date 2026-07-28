@@ -21,28 +21,32 @@ class TargetNpcCache:
 
         try:
             results = self.api_client.get(
-                "/api/v1/quarm/npcs",
+                "/api/v1/quarm/npcs-simple",
                 params={
                     "zone": zone_name,
-                    "limit": 5000,
                 },
             )
-
+            names = results.get("names", [])
             self.npc_names = {
-                self.normalize_name(npc["name"])
-                for npc in results
-                if npc.get("name")
-            }
+                self.normalize_name(name)
+                for name in names
+                if isinstance(name, str) and name.strip()
+            }            
 
-            self.logger.debug(
+            self.logger.log_to_file(
+                "info",
                 f"Loaded {len(self.npc_names)} NPC names "
                 f"for {zone_name}"
             )
 
         except Exception as error:
-            self.logger.warning(
-                f"Could not load NPC names for {zone_name}: {error}"
-            )
 
+            self.logger.log_to_file(
+                "warning",
+                    [
+                        f"Could not load NPC names for {zone_name}: "
+                        f"Error:  {error}"
+                   ]
+                )                     
     def is_known_npc(self, target_name):
         return self.normalize_name(target_name) in self.npc_names

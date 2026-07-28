@@ -314,10 +314,10 @@ class zeal_pipe_monitor:
             None,
         )
 
-        self.logger.log_to_file(
-            "info",
-            "Connected to Zeal pipe.",
-        )
+        # self.logger.log_to_file(
+        #     "info",
+        #     "Connected to Zeal pipe.",
+        # )
 
     def _close_pipe(self):
  

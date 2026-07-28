@@ -7,9 +7,13 @@ from pathlib import Path
 from datetime import datetime
 
 from PySide6.QtCore import QFile, QTimer, Qt
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QBrush, QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QTabWidget, QTextBrowser, QPushButton, QTextEdit, QListWidget, QComboBox, QLabel, QProgressBar, QMessageBox
+from PySide6.QtWidgets import (
+    QApplication, QTabWidget, QTextBrowser, 
+    QPushButton, QTextEdit, QListWidget, QComboBox, QLabel, QProgressBar, 
+    QMessageBox, QTableWidgetItem,QTableWidget,
+)
 from PySide6.QtGui import QTextCursor
 
 from helpers.zeal_pipes import zeal_pipe_monitor
@@ -147,19 +151,21 @@ class MainWindowApp:
         self.menu_member_services = self.window.findChild(QAction, "menu_member_services")
 
         ## mob info
-        self.mob_info_id = self.window.findChild(QAction,"mob_info_id")
-        self.mob_info_race = self.window.findChild(QAction, "mob_info_race")
-        self.mob_info_class = self.window.findChild(QAction, "mob_info_class")
-        self.mob_info_lvlrng = self.window.findChild(QAction, "mob_info_lvlrng")
-        self.mob_info_hp = self.window.findChild(QAction, "mob_info_hp")
-        self.mob_info_ac = self.window.findChild(QAction,"mob_info_ac")
-        self.mob_info_slowable = self.window.findChild(QAction, "mob_info_slowable")
-        self.mob_info_mezzable = self.window.findChild(QAction,  "mob_info_mezzable")
-        self.mob_info_charmable = self.window.findChild(QAction, "mob_info_charmable")
-        self.mob_info_stunimmune = self.window.findChild(QAction,  "mob_info_stunimmune")
-        self.mob_info_pacifyimmune = self.window.findChild(QAction, "mob_info_pacifyimmune")
-        self.mob_info_snareimmune = self.window.findChild(QAction, "mob_info_snareimmune")
-        self.mob_info_fearimmune = self.window.findChild(QAction, "mob_info_fearimmune")
+        self.mob_info_id = self.window.findChild(QLabel,"mob_info_id")
+        self.mob_info_race = self.window.findChild(QLabel, "mob_info_race")
+        self.mob_info_class = self.window.findChild(QLabel, "mob_info_class")
+        self.mob_info_lvlrng = self.window.findChild(QLabel, "mob_info_lvlrng")
+        self.mob_info_hp = self.window.findChild(QLabel, "mob_info_hp")
+        self.mob_info_ac = self.window.findChild(QLabel,"mob_info_ac")
+        self.mob_info_slowable = self.window.findChild(QLabel, "mob_info_slowable")
+        self.mob_info_mezzable = self.window.findChild(QLabel,  "mob_info_mezzable")
+        self.mob_info_charmable = self.window.findChild(QLabel, "mob_info_charmable")
+        self.mob_info_stunimmune = self.window.findChild(QLabel,  "mob_info_stunimmune")
+        self.mob_info_pacifyimmune = self.window.findChild(QLabel, "mob_info_pacifyimmune")
+        self.mob_info_snareimmune = self.window.findChild(QLabel, "mob_info_snareimmune")
+        self.mob_info_fearimmune = self.window.findChild(QLabel, "mob_info_fearimmune")
+
+        self.mob_info_saves_tbl = self.window.findChild(QTableWidget, "mob_info_saves_tbl")
         
 
 
@@ -259,7 +265,17 @@ class MainWindowApp:
         except APIClientError as exc:
                 print(exc)        
 
-
+    def _centered_item(self, value, text_color=None):
+        item = QTableWidgetItem(
+            "" if value is None else str(value)
+        )
+        item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+        if text_color:
+            item.setForeground(
+                QBrush(QColor(text_color))
+            )        
+        return item
+    
     def _open_member_services(self):
         # Do not create another copy if it is already open.
         if self.member_services is not None:
@@ -476,6 +492,14 @@ class MainWindowApp:
                         self.player_current_zone = zone            
                         self.label_my_current_zone.setText(self.player_current_zone)
                         self.target_npc_cache.load_zone(self.player_current_zone)
+
+                        self.logger.log_to_file(
+                                "info",
+                                [
+                                    f"Loaded into new zone - {zone}",
+                                   # f"Cached {len(self.target_npc_cache.npc_names)} NPCs for NPC lookup tool"
+                                ]
+                            )                            
                         
                     
                    
@@ -513,11 +537,18 @@ class MainWindowApp:
 
         if target_name:
             self.label_currnet_target.setText(str(target_name))
-            if  str(target_name) != self.player_current_target:
+            if self.target_npc_cache.is_known_npc(target_name) and  str(target_name) != self.player_current_target:
                 self.player_current_target = str(target_name)
                 self._api_quarm_npc_info(str(target_name))
-
+                self.logger.log_to_file(
+                    "info",
+                    [
+                        f"LSF Quarm database checkded for {str(target_name)}"
+                    ]
+                )
                 
+
+              
             
 
         try:
@@ -540,7 +571,54 @@ class MainWindowApp:
                         "zone": self.player_current_zone,
                     }
         )        
-        print(f"mob info: {results}")
+
+    
+        npc = results["results"][0]
+        self.mob_info_id.setText(f'<a href="https://www.pqdi.cc/npc/{str(npc["id"])}"> {str(npc["id"])}</a>')
+        self.mob_info_id.setOpenExternalLinks(True)
+        self.mob_info_race.setText(npc["race"])
+        self.mob_info_class.setText(str(npc["npc_class_name"]))
+        self.mob_info_lvlrng.setText(f"{npc["level"]} - {npc["max_level"]}")
+        self.mob_info_hp.setText(str(npc["combat"]["hp"]))
+        self.mob_info_ac.setText(str(npc["combat"]["ac"]))
+        self.mob_info_slowable.setText(str(npc["crowd_control"]["slow_immune"]))
+        self.mob_info_mezzable.setText(str(npc["crowd_control"]["mez_immune"]))
+        self.mob_info_charmable.setText(str(npc["crowd_control"]["charm_immune"]))
+        self.mob_info_stunimmune.setText(str(npc["crowd_control"]["stun_immune"]))
+        self.mob_info_pacifyimmune.setText(str(npc["crowd_control"]["pacify_immune"]))
+        self.mob_info_snareimmune.setText(str(npc["crowd_control"]["snare_immune"]))
+        self.mob_info_fearimmune.setText(str(npc["crowd_control"]["fear_immune"]))
+
+        self.mob_info_saves_tbl.setRowCount(1)
+        self.mob_info_saves_tbl.setItem(
+                0,
+                0,
+               self._centered_item(str(npc["resistances"]["magic"]), "purple")
+        )
+        self.mob_info_saves_tbl.setItem(
+                0,
+                1,
+               self._centered_item(str(npc["resistances"]["fire"]), "red")
+        )     
+        self.mob_info_saves_tbl.setItem(
+                0,
+                2,
+               self._centered_item(str(npc["resistances"]["cold"]), "blue")
+        )        
+        self.mob_info_saves_tbl.setItem(
+                0,
+                3,
+               self._centered_item(str(npc["resistances"]["disease"]), "black")
+        )        
+        self.mob_info_saves_tbl.setItem(
+                0,
+                4,
+               self._centered_item(str(npc["resistances"]["poison"]), "green")
+        )        
+
+
+
+        #print(f"MR: {str(npc["resistances"]["magic"])}")
 
 
 
@@ -595,6 +673,7 @@ class MainWindowApp:
             self.label_players_in_zone.setText(match.group("count"))
 
             self.player_current_zone =  match.group("zone")
+            self.target_npc_cache.load_zone(self.player_current_zone)
                     
 
 

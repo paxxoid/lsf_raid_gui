@@ -557,7 +557,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="mob_into_id">
+        <widget class="QLabel" name="mob_info_id">
          <property name="text">
           <string/>
          </property>
@@ -567,7 +567,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="mob_into_race">
+        <widget class="QLabel" name="mob_info_race">
          <property name="text">
           <string/>
          </property>
@@ -577,7 +577,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="mob_into_class">
+        <widget class="QLabel" name="mob_info_class">
          <property name="text">
           <string/>
          </property>
@@ -587,7 +587,7 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLabel" name="mob_into_lvlrng">
+        <widget class="QLabel" name="mob_info_lvlrng">
          <property name="text">
           <string/>
          </property>
@@ -597,7 +597,7 @@
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLabel" name="mob_into_hp">
+        <widget class="QLabel" name="mob_info_hp">
          <property name="text">
           <string/>
          </property>
@@ -607,7 +607,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QLabel" name="mob_into_ac">
+        <widget class="QLabel" name="mob_info_ac">
          <property name="text">
           <string/>
          </property>
@@ -634,14 +634,14 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-85</y>
+         <y>0</y>
          <width>255</width>
          <height>232</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QTableWidget" name="tableWidget">
+         <widget class="QTableWidget" name="mob_info_saves_tbl">
           <property name="rowCount">
            <number>0</number>
           </property>
@@ -688,7 +688,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="mob_into_slowable">
+           <widget class="QLabel" name="mob_info_slowable">
             <property name="text">
              <string/>
             </property>
@@ -705,7 +705,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="mob_into_mezzable">
+           <widget class="QLabel" name="mob_info_mezzable">
             <property name="text">
              <string/>
             </property>
@@ -722,7 +722,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLabel" name="mob_into_charmable">
+           <widget class="QLabel" name="mob_info_charmable">
             <property name="text">
              <string/>
             </property>
@@ -739,7 +739,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLabel" name="mob_into_stunimmune">
+           <widget class="QLabel" name="mob_info_stunimmune">
             <property name="text">
              <string/>
             </property>
@@ -756,7 +756,7 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QLabel" name="mob_into_pacifyimmune">
+           <widget class="QLabel" name="mob_info_pacifyimmune">
             <property name="text">
              <string/>
             </property>
@@ -807,9 +807,9 @@
      <widget class="Line" name="line_2">
       <property name="geometry">
        <rect>
-        <x>17</x>
+        <x>7</x>
         <y>99</y>
-        <width>451</width>
+        <width>461</width>
         <height>31</height>
        </rect>
       </property>
