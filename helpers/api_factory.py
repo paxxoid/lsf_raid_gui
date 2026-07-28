@@ -145,6 +145,8 @@ class APIClient:
     def get(
         self,
         endpoint: str,
+        
+        json_data: Optional[dict[str, Any]] = None,
         params: Optional[dict[str, Any]] = None,
     ) -> Any:
         """
@@ -162,6 +164,7 @@ class APIClient:
         return self._request(
             "GET",
             endpoint,
+            json_data=json_data,
             params=params,
         )
 

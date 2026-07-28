@@ -30,6 +30,7 @@ logging:
 
 zeal_pipes:
   reconnect_delay: 2
+  zeal_message_poll_delay: 250
   zeal_types_to_relay_base: [0, 1]
   zeal_log_types_to_relay: [281, 286, 287]
   zeal_label_types_to_relay: [28, 29]

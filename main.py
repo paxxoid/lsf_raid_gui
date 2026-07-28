@@ -17,6 +17,7 @@ from helpers.yaml_support import YAMLParser
 from helpers.app_state import AppState
 from helpers.logging_support import Logger
 from helpers.api_factory import APIClient, APIClientError
+from helpers.target_npc_cache import  TargetNpcCache
 from windows.player_search import  PlayerSearchWindow
 from windows.member_services import MemberServices
 
@@ -62,9 +63,20 @@ class MainWindowApp:
                 api_key= self.yaml_data.get_yaml_data("app_info", "general").get("lsf_apikey"),
             )        
 
+        self.target_npc_cache = TargetNpcCache(
+            api_client=self.client,
+            logger=self.logger,
+        )
+
+
+        self.zeal_poll_delay = self.yaml_data.get_yaml_data("zeal_pipes", "zeal_message_poll_delay")
+
         self.player_search_window = None
         self.member_services = None    
         self.monitor = None    
+
+        self.player_current_zone = None
+        self.player_current_target = None
 
         self._setup_widget_references()
         self._connect_signals()
@@ -134,6 +146,21 @@ class MainWindowApp:
         self.menu_player_search = self.window.findChild(QAction, "menu_player_search")
         self.menu_member_services = self.window.findChild(QAction, "menu_member_services")
 
+        ## mob info
+        self.mob_info_id = self.window.findChild(QAction,"mob_info_id")
+        self.mob_info_race = self.window.findChild(QAction, "mob_info_race")
+        self.mob_info_class = self.window.findChild(QAction, "mob_info_class")
+        self.mob_info_lvlrng = self.window.findChild(QAction, "mob_info_lvlrng")
+        self.mob_info_hp = self.window.findChild(QAction, "mob_info_hp")
+        self.mob_info_ac = self.window.findChild(QAction,"mob_info_ac")
+        self.mob_info_slowable = self.window.findChild(QAction, "mob_info_slowable")
+        self.mob_info_mezzable = self.window.findChild(QAction,  "mob_info_mezzable")
+        self.mob_info_charmable = self.window.findChild(QAction, "mob_info_charmable")
+        self.mob_info_stunimmune = self.window.findChild(QAction,  "mob_info_stunimmune")
+        self.mob_info_pacifyimmune = self.window.findChild(QAction, "mob_info_pacifyimmune")
+        self.mob_info_snareimmune = self.window.findChild(QAction, "mob_info_snareimmune")
+        self.mob_info_fearimmune = self.window.findChild(QAction, "mob_info_fearimmune")
+        
 
 
 
@@ -175,7 +202,7 @@ class MainWindowApp:
             self.disconnect_action.triggered.connect(self.disconnect_from_zeal)
 
         self.timer.timeout.connect(self.flush_monitor_messages)
-        self.timer.start(250)
+        self.timer.start(int(self.zeal_poll_delay))
 
     def _update_raid_attendance(self):
         index = self.raids_scheduled_combo.currentIndex()
@@ -422,7 +449,7 @@ class MainWindowApp:
                 continue
 
             if numeric_type == 287:
-                print(message)
+                #print(message)
                 if message and "a magic die is rolled by" in str(message).lower():
                     continue
                 standard_clean= self._format_message(message)
@@ -434,10 +461,29 @@ class MainWindowApp:
                 target = self.text_zeal_loot_output
                 target.append(self._format_message(message))
             else:
+                
+                if message and "you have entered" in str(message).lower():
+
+                    data = message["data"]
+
+                    if isinstance(data.get("data"), str):
+                        data = json.loads(data["data"])
+
+                    zone = data.get("text")
+                    match = re.fullmatch(r"You have entered (.+)\.", zone)
+                    if match:
+                        zone = match.group(1)
+                        self.player_current_zone = zone            
+                        self.label_my_current_zone.setText(self.player_current_zone)
+                        self.target_npc_cache.load_zone(self.player_current_zone)
+                        
+                    
+                   
                 target = self.text_zeal_output
                 target.append(self._format_message(message))
 
             #target.append(self._format_message(message))
+
 
     # def _target_message_parse(self, message):
     #         data = message.get("data") if isinstance(message, dict) else None
@@ -467,13 +513,36 @@ class MainWindowApp:
 
         if target_name:
             self.label_currnet_target.setText(str(target_name))
+            if  str(target_name) != self.player_current_target:
+                self.player_current_target = str(target_name)
+                self._api_quarm_npc_info(str(target_name))
+
+                
+            
 
         try:
             health = int(health_value)
         except (TypeError, ValueError):
             return
 
-        self.target_health_bar.setValue(health)    
+        self.target_health_bar.setValue(health)   
+        
+
+        ## mob info:
+
+
+    def _api_quarm_npc_info(self, target_name):
+        ## mob info:
+        results = self.client.get(
+                    "/api/v1/quarm/npcs/by-name",
+                    params={
+                        "name": target_name,
+                        "zone": self.player_current_zone,
+                    }
+        )        
+        print(f"mob info: {results}")
+
+
 
 
     def _get_message_type(self, message):
@@ -524,6 +593,8 @@ class MainWindowApp:
         if match:
             self.label_my_current_zone.setText(match.group("zone"))
             self.label_players_in_zone.setText(match.group("count"))
+
+            self.player_current_zone =  match.group("zone")
                     
 
 
