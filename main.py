@@ -475,7 +475,11 @@ class MainWindowApp:
                 print(f"message {message}")
             elif numeric_type == 286:
                 target = self.text_zeal_loot_output
-                target.append(self._format_message(message))
+                lootmsg = self._format_message(message)
+                target.append(lootmsg)
+                print(f"Loot message {message}")
+                print(f"Loot message {lootmsg)}")
+                _upload_loot_to_db(self, lootmsg), self.player_current_zone)
             else:
                 
                 if message and "you have entered" in str(message).lower():
@@ -506,16 +510,7 @@ class MainWindowApp:
                 target = self.text_zeal_output
                 target.append(self._format_message(message))
 
-            #target.append(self._format_message(message))
-
-
-    # def _target_message_parse(self, message):
-    #         data = message.get("data") if isinstance(message, dict) else None
-    #         numeric_type = self._get_message_type(message)
-    #         if numeric_type == 28 or numeric_type == 29:
-    #             self.label_currnet_target.setText(data[0]['value'])
-    #             self.target_health_bar.setValue(int(data[1]['value']))                
-
+    
     def _target_message_parse(self, message):
         if not isinstance(message, dict):
             return
@@ -559,7 +554,48 @@ class MainWindowApp:
         self.target_health_bar.setValue(health)   
         
 
-        ## mob info:
+       ## left off here
+    def _upload_loot_to_db(self, lootmsg, zone=None, raidid=None):
+            if raidid == None:
+                self.logger.log_to_file(
+                    "warning",
+                    [
+                        f"Recorded loot but we have no raid ID! Loot was NOT recorded",
+                        f"If this is a mistake, you will need to add loot manually and ensure you select raid from the dropdown"
+
+                    ]
+                ) 
+                return
+            
+            if zone == None:
+                results = self.client.post(
+                        "/api/v1/loot/create",
+                        json={
+                            "name": target_name,
+                            "zone": self.player_current_zone,
+                         }
+                )        
+
+               
+                self.logger.log_to_file(
+                    "warning",
+                    [
+                        f"Recorded loot but we have no zone. Loot was updated but with incomplete datad",
+                        f"Try typing /who to record set zone variable"
+
+                    ]
+                ) 
+                        
+                
+             
+             results = self.client.get(
+                            "/api/v1/quarm/npcs/by-name",
+                            params={
+                                "name": target_name,
+                                "zone": self.player_current_zone,
+                            }
+                )        
+
 
 
     def _api_quarm_npc_info(self, target_name):
