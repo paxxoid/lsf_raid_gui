@@ -1,3 +1,4 @@
+from ast import Not
 import json
 import re
 import sys
@@ -10,7 +11,7 @@ from PySide6.QtCore import QFile, QTimer, Qt
 from PySide6.QtGui import QAction, QBrush, QColor
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
-    QApplication, QTabWidget, QTextBrowser, 
+    QApplication, QCheckBox, QTabWidget, QTextBrowser, 
     QPushButton, QTextEdit, QListWidget, QComboBox, QLabel, QProgressBar, 
     QMessageBox, QTableWidgetItem,QTableWidget,
 )
@@ -81,6 +82,17 @@ class MainWindowApp:
 
         self.player_current_zone = None
         self.player_current_target = None
+
+        ##raid info
+        self.selected_raid_event_id = None
+        self.selected_raid_title = None
+        self.selected_raid_date = None
+        self.selected_raid_start_time = None
+        self.selected_raid_end_time = None
+        self.selected_raid_end_zone = None
+
+        self.session_looted_items = []
+        
 
         self._setup_widget_references()
         self._connect_signals()
@@ -165,6 +177,16 @@ class MainWindowApp:
         self.mob_info_snareimmune = self.window.findChild(QLabel, "mob_info_snareimmune")
         self.mob_info_fearimmune = self.window.findChild(QLabel, "mob_info_fearimmune")
 
+
+        self.chk_auto_update = self.window.findChild(QCheckBox, "chk_auto_update")
+
+        self.auto_update_timer = QTimer(self.window)
+        self.auto_update_timer.setInterval(5 * 60 * 1000)  # 5 minutes
+        self.auto_update_timer.timeout.connect(
+            self._update_raid_attendance
+        )
+
+
         self.mob_info_saves_tbl = self.window.findChild(QTableWidget, "mob_info_saves_tbl")
         
 
@@ -210,18 +232,48 @@ class MainWindowApp:
         self.timer.timeout.connect(self.flush_monitor_messages)
         self.timer.start(int(self.zeal_poll_delay))
 
+
+        self.chk_auto_update.toggled.connect(self._auto_update_changed)
+
+
+    def _auto_update_changed(self, checked: bool):
+        if checked:
+            self.auto_update_timer.start()
+            self.logger.log_to_file(
+                    "info",
+                    [
+                        f"Auto Update Raid Attendance is ENABLED and will run every 5 minutes",
+                        f"NOTE: please moniotor the log tab for any errors or issues with the update process",
+                        f"including players not found in the database, these will need to be added manually, and then roster updated",
+                        f"You can still press the update button as needed"
+                    ]
+                ) 
+        else:
+            self.auto_update_timer.stop()
+            self.logger.log_to_file(
+                    "info",
+                    [
+                        f"Auto Update Raid Attendance is DISABLED",
+                        f"You will need to manually update the database by pressing the Update button."
+                    ]
+                )
+
+
+
     def _update_raid_attendance(self):
         index = self.raids_scheduled_combo.currentIndex()
         if index == -1:
-            QMessageBox.critical(
-                self.window,
-                "Error",
-                "You need to select a raid \n before updating the database!.",
-            )
+            if not self.chk_auto_update.isChecked():
+                QMessageBox.critical(
+                    self.window,
+                    "Error",
+                    "You need to select a raid \n before updating the database!.",
+                )
+            
             self.logger.log_to_file(
                  "WARNING", 
                     [
-                        f"Database was no updated, please select Raid Event first from the dropdown.",
+                        f"Database was not updated, please select Raid Event first from the dropdown.",
                     ]
                 )                        
             return
@@ -255,11 +307,13 @@ class MainWindowApp:
                             f"Update Info: {json.dumps(results, indent=2)}"
                             ]
                     )  
-            QMessageBox.information(
-                    self.window,
-                    "Raid Attendance Updated",
-                    f" {results['raid_event']}: Update - {results['added_count']}, ignored/already in the databse: {results['existing_count']}! \n\n PLEASE review log tab for more details.",
-            )                    
+            if not self.chk_auto_update.isChecked():
+                    QMessageBox.information(
+                        self.window,
+                        "Raid Attendance Updated",
+                        f" {results['raid_event']}: Update - {results['added_count']}, ignored/already in the databse: {results['existing_count']}! \n\n PLEASE review log tab for more details.",
+                )   
+                                                            
             self.app_state.load_app_state()        
 
         except APIClientError as exc:
@@ -462,6 +516,10 @@ class MainWindowApp:
 
             if numeric_type == 281:
                 self._display_who_members(message)
+                #print(f"WHO message {message}")
+                # if self.chk_auto_update.isChecked():
+                #     self._update_raid_attendance()
+                
                 continue
 
             if numeric_type == 287:
@@ -475,11 +533,11 @@ class MainWindowApp:
                 print(f"message {message}")
             elif numeric_type == 286:
                 target = self.text_zeal_loot_output
-                lootmsg = self._format_message(message)
+                lootmsg = self._format_message(message, type="286")
                 target.append(lootmsg)
                 print(f"Loot message {message}")
-                print(f"Loot message {lootmsg)}")
-                _upload_loot_to_db(self, lootmsg), self.player_current_zone)
+                print(f"Loot message {lootmsg}")
+                self._upload_loot_to_db(lootmsg, self.player_current_zone, self.selected_raid_event_id)
             else:
                 
                 if message and "you have entered" in str(message).lower():
@@ -555,8 +613,35 @@ class MainWindowApp:
         
 
        ## left off here
-    def _upload_loot_to_db(self, lootmsg, zone=None, raidid=None):
-            if raidid == None:
+    def _upload_loot_to_db(self, lootmsg, zone=None, raid_id=None):
+            
+            LOOT_PATTERN = re.compile(
+                r"^\[LootMessage\]\s+"
+                r"(?P<sender>[^:]+):\s+"
+                r"(?P<looter>\S+)\s+has looted\s+"
+                r"(?P<item>.+?)\s*$"
+            )
+            match = LOOT_PATTERN.match(lootmsg.strip())
+            if match:
+                loot_player = match.group("looter")
+                looted_item = match.group("item")
+                ## final cleaning, remove nay leading a
+
+                looted_item = re.sub(r"^(?:a|an)\s+", "", looted_item, flags=re.IGNORECASE)
+
+            member_id = next(
+                    (
+                        player.get("id")
+                        for player in self.app_state.PLAYER_RECORDS
+                        if player.get("character_name", "").casefold()
+                        == loot_player.strip().casefold()
+                    ),
+                None,
+            )            
+
+            print(f"loot_player {loot_player} - looted_item {looted_item} - member_id {member_id} raid_id {raid_id}")
+            
+            if raid_id == None:
                 self.logger.log_to_file(
                     "warning",
                     [
@@ -566,35 +651,56 @@ class MainWindowApp:
                     ]
                 ) 
                 return
-            
-            if zone == None:
-                results = self.client.post(
-                        "/api/v1/loot/create",
-                        json={
-                            "name": target_name,
-                            "zone": self.player_current_zone,
-                         }
-                )        
 
-               
+            if member_id == None:
                 self.logger.log_to_file(
                     "warning",
                     [
-                        f"Recorded loot but we have no zone. Loot was updated but with incomplete datad",
+                        f"Recorded loot but we have no member ID for {loot_player} ! Loot was NOT recorded",
+                        f"Member was not found in database, please add member if a part of LSF and add the item manually"
+
+                    ]
+                ) 
+                return                
+
+
+            
+            if zone == None:
+                self.logger.log_to_file(
+                    "warning",
+                    [
+                        f"Curent zone is missing and reuired! Loot was NOT recorded!",
                         f"Try typing /who to record set zone variable"
 
                     ]
                 ) 
                         
-                
+                return
              
-             results = self.client.get(
-                            "/api/v1/quarm/npcs/by-name",
-                            params={
-                                "name": target_name,
-                                "zone": self.player_current_zone,
-                            }
-                )        
+            results = self.client.post(
+                                "/api/v1/loot/create",
+                                json_data={
+                                    "raid_event_id": raid_id,
+                                    "member_id": member_id,
+                                    "item_name": looted_item,
+                                    "item_url": "https://www.pqdi.cc/item/{}",
+                                    "awarded_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                                    "zone": zone
+
+                                }
+                            )   
+            
+            self.logger.log_to_file(
+                    "Info",
+                    [
+                        f"Loot added to the database for {loot_player}, looting {looted_item}",
+                        f"{json.dumps(results, indent=2)}"
+
+                    ]
+                )      
+
+            self.session_looted_items.append(results)
+        
 
 
 
@@ -765,6 +871,8 @@ class MainWindowApp:
         return f"[{type_name}] {character}"
 
     def _clean_text(self, text, character=None, type=None):
+       #print("#### IN CLEAN  ####")
+    
         cleaned = str(text).strip()
         cleaned = cleaned.replace("**", "")
         cleaned = cleaned.replace("--", "")
@@ -784,6 +892,19 @@ class MainWindowApp:
                 minimum, maximum, rolled = map(int, match.groups())    
                 cleaned = f"Rolled between {minimum} and {maximum}, turned up a {rolled} "        
 
+        if type == "286": # loot
+            print(f" before cleaned: {cleaned}")
+            cleaned = cleaned.replace("has looted a ", "has looted ")
+            print(f" after cleaned: {cleaned}")
+
+            cleaned = re.sub(r"\d+(?=\s*[A-Za-z])", "", cleaned)
+            #print(f"clean1: {cleaned}")
+            cleaned = re.sub(r"\b\d{4,}\b", "", cleaned)
+            #print(f"clean2: {cleaned}")
+            cleaned = re.sub(r"\s+", " ", cleaned).strip()
+            #print(f"clean3 {cleaned}")
+            cleaned = cleaned.strip(".- ")
+            #print(f"clean4 {cleaned}")             
 
         else:
 
@@ -810,17 +931,24 @@ class MainWindowApp:
                 formatted_time_end = datetime.fromisoformat(
                         raids['end_at'].replace("Z", "+00:00")
                     ).strftime("%I:%M %p")                   
-                            
-                self.raids_scheduled_combo.addItem(f"{raids['title']} -  {formatted_date}", 
-                                                {
-                                                        "id": raids['id'],
-                                                        "title": raids['title'],
-                                                        "start_at": formatted_time_start,
-                                                        "end_at":formatted_time_end,
-                                                        "zone": raids['zone'],
-                                                        "date": formatted_date
-                                                    }
-                                                )
+
+                if formatted_date >= datetime.now().strftime("%m/%d/%Y"):
+                    self.logger.log_to_file(
+                        "info",
+                        [
+                            f"Raid Event: {raids['title']} - {formatted_date} - {formatted_time_start} to {formatted_time_end} - {raids['zone']}"
+                        ]
+                    )
+                    self.raids_scheduled_combo.addItem(f"{raids['title']} -  {formatted_date}", 
+                                                    {
+                                                            "id": raids['id'],
+                                                            "title": raids['title'],
+                                                            "start_at": formatted_time_start,
+                                                            "end_at":formatted_time_end,
+                                                            "zone": raids['zone'],
+                                                            "date": formatted_date
+                                                        }
+                                                    )
         except Exception as e:
             self.logger.log_to_file(
                     "CRITICAL",

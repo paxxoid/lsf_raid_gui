@@ -29,6 +29,7 @@ class zeal_pipe_monitor:
         self.who_message_queue = queue.Queue(maxsize=1000)
 
         self.eq_pid = None
+        self.pid_manual = None # for testing whe 2 eqs are open - example, I am playing EQL
 
         self.message_buffer = ""
         self.gui_sink = None
@@ -105,10 +106,15 @@ class zeal_pipe_monitor:
             return False
 
         try:
-            self.eq_pid = self._find_eqgame_pid("eqgame.exe")
+            if self.pid_manual is None:
+                self.eq_pid = self._find_eqgame_pid("eqgame.exe")
+            else:
+                self.eq_pid = self.pid_manual
+
+           # print(f"eq_pid: {self.eq_pid}")
         except RuntimeError as error:
             self.logger.log_to_file("error", str(error))
-            show_error(
+            self.show_error(
                 self.parent,
                 str(error),
                 title="EverQuest Not Found",

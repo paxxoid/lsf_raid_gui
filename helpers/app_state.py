@@ -14,6 +14,14 @@ class AppState:
         self.raid_attendance = []
         self.loot_records = []
         self.rais_scheduled = []
+        self.loot_excluded_names = []
+        
+
+
+
+
+
+
         self.yaml_date = yaml_data
         self.logger = logger
 
@@ -22,6 +30,8 @@ class AppState:
         self.api_key = self.yaml_date.get_yaml_data("app_info", "general").get("lsf_apikey")
 
         self.load_app_state()
+
+
 
     def load_app_state(self):
         """Load the application state from a file or database."""

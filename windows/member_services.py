@@ -166,14 +166,14 @@ class MemberServices:
         character_name = self.text_character_name.text().strip()
         selected_data = self.combo_select_current_users.currentData()
         main_character = self.combo_main_character.currentText()
-        selected_class = self.combo_class.currentText().lower()
-        selected_type = self.combo_character_type.currentText().lower()
-        select_rank = self.combo_guild_rank.currentText().lower()
+        selected_class = self.combo_class.currentData().lower()
+        selected_type = self.combo_character_type.currentData().lower()
+        select_rank = self.combo_guild_rank.currentData().lower()
         active = self.check_active.isChecked()
         raider = self.checkBox_raider.isChecked()
         level = self.member_level.value()
         bio = self.text_bio.toPlainText().strip()
-        race = self.combo_race.currentText().lower()
+        race = self.combo_race.currentData().lower()
         selected_date = self.date_joined.date().toString("yyyy-MM-dd")
         current_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -259,6 +259,20 @@ class MemberServices:
                     )                    
         else:
             try:
+
+                json_data= {
+                                "character_name": character_name,
+                                "character_type": selected_type,
+                                "main_character_id": main_character_id,
+                                "class_name": selected_class,
+                                "race": race,
+                                "level": level,
+                                "rank": select_rank,
+                                "active": active,
+                                "raider": raider,
+                                "bio": bio,
+                                "joined_at": current_date
+                            }                
                 results = self.api_client.post (
                             f"/api/v1/members/create",
                             json_data={
@@ -288,6 +302,7 @@ class MemberServices:
                         self.window,
                         "New player added!",
                         f"ID {results['id']} - {results['character_name']} successfully Added! \n\n Review log tab for more details.",
+                        
                     )                              
                                 
                     self.app_state.load_app_state()
@@ -298,6 +313,7 @@ class MemberServices:
                         [
                             f"API Error adding a new member!",
                             f"The error: {str(e)}"
+                            f"json_package: {json.dumps(json_data, indent=2)}"
                         ]
                     )     
                 QMessageBox.warning(
@@ -350,17 +366,19 @@ class MemberServices:
         self.combo_race.clear()
         self.combo_race.addItem("Select Race", None)
         self.combo_race.addItem("Barbarian", "barbarian")
-        self.combo_race.addItem("Dark Elf", "dark_elf")
+        self.combo_race.addItem("Dark Elf", "dark elf")
         self.combo_race.addItem("Dwarf", "dwarf")
         self.combo_race.addItem("Erudite", "erudite")
         self.combo_race.addItem("Gnome", "gnome")
-        self.combo_race.addItem("Half Elf", "half_elf")
+        self.combo_race.addItem("Half Elf", "half elf")
         self.combo_race.addItem("Halfling", "halfling")
-        self.combo_race.addItem("High Elf", "high_elf")
+        self.combo_race.addItem("High Elf", "high elf")
+        self.combo_race.addItem("Iksar", "iksar")
         self.combo_race.addItem("Human", "human")
         self.combo_race.addItem("Ogre", "ogre")
         self.combo_race.addItem("Troll", "troll")
-        self.combo_race.addItem("Wood Elf", "wood_elf")
+        self.combo_race.addItem("Vah Sir", "vah sir")
+        self.combo_race.addItem("Wood Elf", "wood elf")
         self.combo_race.setCurrentIndex(0)
 
         #maintype
