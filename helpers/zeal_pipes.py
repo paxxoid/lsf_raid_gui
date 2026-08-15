@@ -183,7 +183,6 @@ class zeal_pipe_monitor:
         self.running = False
 
     def get_pending_raw_messages(self):
-        """Return messages waiting for the GUI without blocking."""
         messages = []
 
         while True:
@@ -197,7 +196,7 @@ class zeal_pipe_monitor:
         return messages
 
     def process_pending_messages(self):
-        """Drain the worker queues and hand the batch to the GUI sink."""
+        # shjould work to drain any existing message queues
         batch = []
 
         while True:
@@ -216,7 +215,7 @@ class zeal_pipe_monitor:
         return batch
 
     def get_pending_parsed_messages(self):
-        """Return messages waiting for the GUI without blocking."""
+
         messages = []
 
         while True:
@@ -230,7 +229,6 @@ class zeal_pipe_monitor:
         return messages    
     
     def get_pending_filtered_messages(self):
-        """Return messages waiting for the GUI without blocking."""
         messages = []
 
         while True:
@@ -245,9 +243,6 @@ class zeal_pipe_monitor:
     
 
     def _read_message(self):
-        """
-        Read a block of data from the Zeal named pipe.
-        """
 
         try:
             _, raw_data = win32file.ReadFile(
@@ -424,19 +419,16 @@ class zeal_pipe_monitor:
         return parsed_messages
     
     def _process_outer_message(self, outer_data):
-        """
-        Convert one Zeal outer JSON object into a normalized dictionary.
-
-        Outer message categories and their sub-types have separate filters.
-        For example:
-
-            1   = Label
-            28  = TargetName
-            29  = TargetHPPerc
-            281 = WhoCommand
-            286 = LootMessage
-            287 = DiceRoll
-        """
+        
+        #important Zeal pipe message types wer'e using
+        #
+        #    1   = Label
+        #    28  = TargetName
+        #    29  = TargetHPPerc
+        #    281 = WhoCommand
+        #    286 = LootMessage
+        #    287 = DiceRoll
+        
 
         raw_event_type = outer_data.get("type")
 
@@ -537,9 +529,8 @@ class zeal_pipe_monitor:
                 "data": inner_data,
             }
 
-        #
-        # LogText messages
-        #
+
+
         if raw_event_type == PipeMessageType.LogText.value:
             inner_type = None
 
@@ -605,10 +596,7 @@ class zeal_pipe_monitor:
                 "data": inner_data,
             }
 
-        #
-        # Ignore non-LogText outer messages when the config contains
-        # LogType values such as 281, 286, and 287.
-        #
+
         return None    
 
     def parse_zeal_message(self, raw_message):
@@ -643,19 +631,3 @@ class zeal_pipe_monitor:
             "data": message,
         }             
 
-    # def should_relay_message(self, message):
-    #     message_type = PipeMessageType.from_value(
-    #         message.get("type")
-    #     )
-
-    #     if message_type != PipeMessageType.LogText:
-    #         return False
-
-    #     log_type = LogType.from_value(
-    #         message.get("value")
-    #     )
-
-    #     if log_type is None:
-    #         return False
-
-    #     return log_type.value in self.zeal_types_to_relay            

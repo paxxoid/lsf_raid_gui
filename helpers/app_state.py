@@ -25,7 +25,7 @@ class AppState:
         self.yaml_date = yaml_data
         self.logger = logger
 
-        #self.api_key = "lasf_LGLjVSi6LbgbDOs4MbtFY8QS7YKCwrRFY6kjooPW_Z0"
+
         self.base_url = self.yaml_date.get_yaml_data("app_info", "general").get("lsf_baseurl")
         self.api_key = self.yaml_date.get_yaml_data("app_info", "general").get("lsf_apikey")
 
@@ -34,9 +34,6 @@ class AppState:
 
 
     def load_app_state(self):
-        """Load the application state from a file or database."""
-        # For now, we will just return a new instance of AppState.
-        # In a real application, you would load the state from a file or database.
         try:
                 client = APIClient(
                         base_url="https://lootandsomefun.com",
