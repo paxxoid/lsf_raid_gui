@@ -181,7 +181,7 @@ class MainWindowApp:
         self.chk_auto_update = self.window.findChild(QCheckBox, "chk_auto_update")
 
         self.auto_update_timer = QTimer(self.window)
-        self.auto_update_timer.setInterval(5 * 60 * 1000)  # 5 minutes
+        self.auto_update_timer.setInterval(2 * 60 * 1000)  # 2 minutes
         self.auto_update_timer.timeout.connect(
             self._update_raid_attendance
         )
@@ -242,10 +242,11 @@ class MainWindowApp:
             self.logger.log_to_file(
                     "info",
                     [
-                        f"Auto Update Raid Attendance is ENABLED and will run every 5 minutes",
+                        f"Auto Update Raid Attendance is ENABLED and will run every 2 minutes",
                         f"NOTE: please moniotor the log tab for any errors or issues with the update process",
                         f"including players not found in the database, these will need to be added manually, and then roster updated",
-                        f"You can still press the update button as needed"
+                        f"You can still press the update button as needed",
+                        f"A /who IN GAME IS STILL REQUIRED TO OBTAIN A LIST OF NAMES.  Type /who often!"
                     ]
                 ) 
         else:
@@ -302,7 +303,7 @@ class MainWindowApp:
             self.logger.log_to_file(
                     "INFO", 
                         [
-                            f"Raid Attendance Update!"
+                            f"Raid Attendance Update!",
                             f"NOTE: only know characters were updated. Those not on a the guild roster are ignored!",
                             f"Update Info: {json.dumps(results, indent=2)}"
                             ]

@@ -47,7 +47,7 @@ class AppState:
                 self.PLAYER_RECORDS = client.get(
                     "/api/v1/members",
                     params={
-                        "limit": 100,
+                        "limit": 5000,
                         "offset": 0,
                     },
                 )
@@ -55,7 +55,7 @@ class AppState:
                 self.raid_attendance = client.get(
                     "/api/v1/attendance",
                     params={
-                        "limit": 100,
+                        "limit": 5000,
                         "offset": 0,
                     },
                 )
@@ -63,7 +63,7 @@ class AppState:
                 self.loot_records = client.get(
                     "/api/v1/loot",
                     params={
-                        "limit": 100,
+                        "limit": 5000,
                         "offset": 0,
                     },
                 )
@@ -71,7 +71,7 @@ class AppState:
                 self.raid_scheduled = client.get(
                     "/api/v1/raids",
                     params={
-                        "limit": 500,
+                        "limit": 5000,
                         "offset": 0,
                     },
                 )                

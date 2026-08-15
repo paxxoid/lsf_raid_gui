@@ -4,9 +4,9 @@ app_info:
   general:
     name: lsf_raid_helper_gui
     version: 0.0.1
-    desc: Handles excel file creation and email for daily disbution of year over year KPIs vs same week LY
+    desc: LSF desktop app
     debug_mode: False
-    lsf_apikey: lasf_LGLjVSi6LbgbDOs4MbtFY8QS7YKCwrRFY6kjooPW_Z0
+    lsf_apikey: api_key
     lsf_baseurl: https://lootandsomefun.com
 
 
